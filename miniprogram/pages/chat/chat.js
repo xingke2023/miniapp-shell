@@ -446,7 +446,7 @@ function mdToHtml(text) {
 Page({
   data: {
     statusBarHeight: 0,
-    appTitle: '舌尖生鲜', // 顶部标题，后台 app_config 可覆盖
+    appTitle: 'AI落地应用', // 顶部标题，后台 app_config miniprogram_title 可覆盖
     user: null,
     logging: false,
     loginForm: { username: '', password: '' },
@@ -474,42 +474,7 @@ Page({
     // 快捷功能菜单。badge 可以是数字（'3'）或字符（'NEW'），留空则不显示。
     // 点击后 prompt 直接作为用户消息发出去，AI 来响应。
     // 若 items 非空，则改为弹出底部子菜单，由用户选择具体子项。
-    quickActions: [
-      { key: 'inventory', emoji: '📦', label: '今日库存', badge: '',
-        open: { path: '/inventory', title: '今日库存' } },
-      {
-        key: 'sales', emoji: '💰', label: '今日销售', badge: '',
-        items: [
-          { key: 'sales-stat',   emoji: '📊', label: '销售统计',     desc: '每日销售报表', route: '/pages/report/report?path=%2Fsales-report&title=%E9%94%80%E5%94%AE%E7%BB%9F%E8%AE%A1' },
-          { key: 'sales-upload', emoji: '📤', label: '上传销售报表', desc: '拍照/相册/文件 AI 识别入库', route: '/pages/sales-upload/sales-upload' },
-        ],
-      },
-      { key: 'damage',    emoji: '🗑️', label: '损耗记录', badge: '',
-        route: '/pages/damage/damage' },
-      {
-        key: 'purchase', emoji: '🚚', label: '进货单记录', badge: '',
-        items: [
-          { key: 'purchase-history', emoji: '📋', label: '历史进货单记录', desc: '看历史上传的单据', route: '/pages/purchase-orders/purchase-orders' },
-          { key: 'purchase-upload',  emoji: '📤', label: '上传进货单',     desc: '拍照/相册/文件 AI 识别入库', route: '/pages/purchase-upload/purchase-upload' },
-        ],
-      },
-      {
-        key: 'report', emoji: '📊', label: '经营查询', badge: '',
-        items: [
-          { key: 'overview',  emoji: '📊', label: '每日营运概况', desc: '往日库存/进货/已售/售罄', route: '/pages/report/report' },
-          { key: 'purchase',  emoji: '🚚', label: '最近进货',     desc: '进货单明细',             prompt: '查一下最近的进货单' },
-          { key: 'suggest',   emoji: '💡', label: '进货建议',     desc: '补货优先级',             prompt: '给我一些进货和促销建议' },
-          { key: 'logs',      emoji: '📝', label: '操作日志',     desc: '今日远程指令留档',       prompt: '看一下今天的操作日志' },
-        ],
-      },
-      { key: 'weather',   emoji: '🌦️', label: '查天气', prompt: '明天天气怎么样', badge: '' },
-      { key: 'help',      emoji: '💡', label: '使用说明', prompt: '你能帮我做什么', badge: '' },
-      // 仅管理员可见（user.is_admin）：经 /admin/sso 用 JWT 免登录进 Filament 后台。
-      // report.js 会把 path 拼成 app61.xingke888.com/admin/sso?token=<JWT>&from=miniapp，
-      // AdminSsoController 解 JWT→写 web session→跳 /admin。
-      { key: 'admin', emoji: '🛠️', label: '后台管理', badge: '', adminOnly: true,
-        open: { path: '/admin/sso', title: '后台管理' } },
-    ],
+    quickActions: [],  // 从后台 /api/quick-actions 动态加载，不写死默认值
 
     // 经营报表 — 锚定在 chip 上方的 popover
     reportMenuOpen: false,
