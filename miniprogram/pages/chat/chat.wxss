@@ -398,6 +398,7 @@
   transform: scale(0.94);
 }
 .qa-emoji { font-size: 28rpx; line-height: 1; }
+.qa-chip-icon { width: 36rpx; height: 36rpx; flex-shrink: 0; }
 .qa-label { font-weight: 400; line-height: 1; }
 .qa-arrow { font-size: 28rpx; line-height: 1; margin-left: 4rpx; opacity: 0.55; display: inline-block; transition: transform 0.2s; }
 .qa-arrow--open { transform: rotate(90deg); opacity: 0.9; }
