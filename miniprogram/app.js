@@ -8,8 +8,6 @@ App({
     ssoRefreshToken: '',
     user: null,
     storeId: null,
-    // 当前会话所选行业 {slug, title, apiBase, apiToken}；仅内存、不写 storage —— 每次进入都重新选行业
-    industry: null,
   },
 
   onLaunch: function () {

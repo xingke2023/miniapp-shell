@@ -16,12 +16,14 @@ class QuickActionItem extends Model
         'route',
         'prompt',
         'sort_order',
+        'show_in_chat',
     ];
 
     protected function casts(): array
     {
         return [
             'sort_order' => 'integer',
+            'show_in_chat' => 'boolean',
         ];
     }
 

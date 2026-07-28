@@ -69,10 +69,6 @@ class QuickAction extends Model
             $node['adminOnly'] = true;
         }
 
-        if ($this->show_in_chat) {
-            $node['showInChat'] = true;
-        }
-
         switch ($this->action_type) {
             case 'prompt':
                 $node['prompt'] = $this->prompt ?? '';
@@ -148,6 +144,7 @@ class QuickAction extends Model
                         'emoji' => $item->emoji ?? '',
                         'label' => $item->label,
                         'desc' => $item->desc ?? '',
+                        'showInChat' => (bool) $item->show_in_chat,
                     ];
                     if ($item->item_type === 'route') {
                         $sub['route'] = $item->route;

@@ -55,6 +55,10 @@ class ItemsRelationManager extends RelationManager
                     ->helperText('route: 小程序页路径；external/external_open: 完整 URL')
                     ->visible(fn (Get $get) => in_array($get('item_type'), ['route', 'external', 'external_open']))
                     ->required(fn (Get $get) => in_array($get('item_type'), ['route', 'external', 'external_open'])),
+                Forms\Components\Toggle::make('show_in_chat')
+                    ->label('显示在聊天区（蓝色胶囊）')
+                    ->helperText('勾选后，登录问候语下方会出现此子项按钮')
+                    ->default(true),
                 Forms\Components\TextInput::make('sort_order')
                     ->label('排序（小在前）')
                     ->numeric()
@@ -87,6 +91,9 @@ class ItemsRelationManager extends RelationManager
                         'external', 'external_open' => 'warning',
                         default => 'gray',
                     }),
+                Tables\Columns\IconColumn::make('show_in_chat')
+                    ->label('聊天区显示')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('sort_order')->label('排序')->sortable(),
             ])
             ->defaultSort('sort_order')

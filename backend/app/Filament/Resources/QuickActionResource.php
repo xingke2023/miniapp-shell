@@ -21,11 +21,11 @@ class QuickActionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = '系统';
 
-    protected static ?string $navigationLabel = '快捷按钮';
+    protected static ?string $navigationLabel = '小程序快捷菜单';
 
-    protected static ?string $modelLabel = '快捷按钮';
+    protected static ?string $modelLabel = '快捷菜单';
 
-    protected static ?string $pluralModelLabel = '快捷按钮';
+    protected static ?string $pluralModelLabel = '小程序快捷菜单';
 
     protected static ?int $navigationSort = 20;
 
@@ -101,11 +101,6 @@ class QuickActionResource extends Resource
                     ->label('启用')
                     ->default(true),
 
-                Forms\Components\Toggle::make('show_in_chat')
-                    ->label('显示在聊天区快捷行')
-                    ->helperText('勾选后，登录问候语下方会出现该按钮（适合子菜单类型）')
-                    ->default(false),
-
                 Forms\Components\Toggle::make('admin_only')
                     ->label('仅管理员可见'),
 
@@ -145,7 +140,6 @@ class QuickActionResource extends Resource
                         'home' => 'danger',
                         default => 'gray',
                     }),
-                Tables\Columns\IconColumn::make('show_in_chat')->label('聊天快捷')->boolean(),
                 Tables\Columns\IconColumn::make('admin_only')->label('仅管理员')->boolean(),
                 Tables\Columns\IconColumn::make('enabled')->label('启用')->boolean(),
             ])

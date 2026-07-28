@@ -87,9 +87,8 @@ function me() {
 }
 
 // 聊天页底部快捷按钮配置（后台可配）
-function quickActions(industry, baseOverride) {
-  var qs = industry ? ('?industry=' + encodeURIComponent(industry)) : '';
-  return request('/quick-actions' + qs, { method: 'GET', timeout: 15000, baseOverride: baseOverride });
+function quickActions() {
+  return request('/quick-actions', { method: 'GET', timeout: 15000 });
 }
 
 // 公开行业列表（无需登录）
@@ -98,8 +97,8 @@ function industries() {
 }
 
 // 公开应用配置（标题等品牌文案，无需登录）
-function appConfig(baseOverride) {
-  return request('/app-config', { method: 'GET', timeout: 15000, baseOverride: baseOverride });
+function appConfig() {
+  return request('/app-config', { method: 'GET', timeout: 15000 });
 }
 
 // 退出登录

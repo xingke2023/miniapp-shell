@@ -464,8 +464,7 @@ Page({
     loginForm: { username: '', password: '' },
     isRegisterMode: false, // false=登录表单，true=注册表单（复用同一组输入框）
 
-    externalMode: false,          // 外部行业：菜单/AI 走外部后端，JWT 来自 industry.apiToken
-    mediaEnabled: false,          // 聊天是否显示语音/拍照/相册/文件输入（本地行业或 ai_media 行业）
+    mediaEnabled: false,
 
     msgs: [],
     typing: false,
@@ -507,12 +506,7 @@ Page({
 
     this._sessionId = null;
 
-    this.setData({ externalMode: false, mediaEnabled: true });
-
-    // 标题优先用所选行业的品牌标题（app_config 作兜底默认）
-    if (ind.title) {
-      this.setData({ appTitle: ind.title });
-    }
+    this.setData({ mediaEnabled: true });
 
     // 应用配置（标题等）——公开接口，登录前也拉取
     this._loadAppConfig();
@@ -520,19 +514,6 @@ Page({
     // 开启右上角「…」菜单里的转发给朋友 / 分享到朋友圈
     if (wx.showShareMenu) {
       wx.showShareMenu({ withShareTicket: false, menus: ['shareAppMessage', 'shareTimeline'] });
-    }
-
-    if (externalMode) {
-      this.setData({ user: null });
-      if (!ind.apiToken) {
-        // 后台未配置服务账号 token，提示管理员
-        this._pushAi('⚠️ 此行业尚未配置服务账号，请联系管理员在后台填写「外部服务账号 Token」。');
-        wx.nextTick(this._recomputeMsgsHeight.bind(this));
-      } else {
-        this._greetExternal();
-      }
-      this._loadQuickActions();
-      return;
     }
 
     // 只有 token + user 都在才算登录；并后台校验 token 是否仍有效
@@ -544,17 +525,6 @@ Page({
     } else {
       // 无缓存登录态：直接展示登录表单，由用户输入自己的账号密码走 SSO 登录
     }
-  },
-
-  // 外部行业欢迎语
-  _greetExternal: function () {
-    var app = getApp();
-    var ind = app.globalData.industry || {};
-    // 优先用后台配置的行业欢迎语，留空再用通用兜底
-    var greeting = ind.greeting
-      || ('欢迎使用 ' + (ind.title || '外部行业') + '！可点菜单进入各功能，也可在输入框直接查询数据。');
-    this._pushAi(greeting);
-    wx.nextTick(this._recomputeMsgsHeight.bind(this));
   },
 
   // 校验缓存的 token 是否仍有效，失效则清空登录态、展示登录表单
@@ -583,7 +553,7 @@ Page({
   // 从后台拉取底部快捷按钮配置；失败/空则保留 data 里写死的默认数组（避免空白）
   _loadQuickActions: function () {
     var self = this;
-    api.quickActions('', '').then(function (res) {
+    api.quickActions().then(function (res) {
       var list = res && res.data;
       if (!list || !list.length) { return; }
       // 给每个主菜单胶囊注入 iconSvg（按 emoji 查对应 SVG）
@@ -593,9 +563,9 @@ Page({
         return Object.assign({}, a, { iconSvg: svg });
       });
       self.setData({ quickActions: list });
-      // 首次加载：showInChat=true 的按钮作为聊天内联快捷行，由 _greetLoggedIn 在问候语之后推入
+      // 聊天区蓝色胶囊：来自后端 shortcuts 数组（子菜单项中 show_in_chat=true 的那些）
       if (!self._initShortcuts) {
-        var chatBtns = list.filter(function (a) { return !!a.showInChat; });
+        var chatBtns = res.shortcuts || [];
         if (chatBtns.length) {
           self._initShortcuts = chatBtns;
           if (self._shortcutsPending) {
@@ -648,10 +618,7 @@ Page({
   _greetLoggedIn: function (user) {
     var name = (user && user.name) || '老板';
     var self = this;
-    var ind = getApp().globalData.industry || {};
-    // 行业欢迎语：后台 industries.greeting 配置；留空用「我是{title}」通用兜底
-    var greeting = ind.greeting
-      || ('我是 ' + (ind.title || 'AI 助手') + '\n\n点下面菜单或直接在输入框跟我说，我来帮你处理。');
+    var greeting = '我是 AI 助手\n\n点下面菜单或直接在输入框跟我说，我来帮你处理。';
     self._pushAi('嗨，' + name + '！👋 欢迎回来～', 600);
     setTimeout(function () {
       self._pushAi(greeting, 1100);
@@ -754,15 +721,7 @@ Page({
     self.setData({ aiBusy: true, typing: true });
     if (self._serviceRestricted()) return;
     self._scrollDown();
-    var app = getApp();
-    var ind = app.globalData.industry;
-    var wlOpts = { sessionId: self._sessionId };
-    if (ind && ind.apiBase) {
-      wlOpts.baseOverride = ind.apiBase;
-      wlOpts.tokenOverride = ind.apiToken || '';
-      wlOpts.pathOverride = ind.aiPath || '';
-    }
-    api.aiMessage(prompt, wlOpts).then(function (res) {
+    api.aiMessage(prompt, { sessionId: self._sessionId }).then(function (res) {
       self._handleAiResult(res);
       self._pushWebLinkCard(web);
     }).catch(function (err) {
@@ -867,16 +826,8 @@ Page({
   // 阻止 popover 内部点击穿透到遮罩
   noop: function () {},
 
-  // 需要登录才能打开的页面：无 token 时显示登录窗口（不跳转，避免报表页闪退）
-  // 外部行业检查 apiToken；普通行业检查 paper token。
   _requireLogin: function () {
     var app = getApp();
-    var ind = app.globalData && app.globalData.industry;
-    if (ind && ind.apiBase) {
-      if (ind.apiToken) { return true; }
-      wx.showToast({ title: '请联系管理员配置服务账号', icon: 'none' });
-      return false;
-    }
     if (app.globalData && app.globalData.token) { return true; }
     this.setData({ user: null });
     wx.showToast({ title: '请先登录', icon: 'none' });
@@ -999,14 +950,7 @@ Page({
           filePath: f.tempFilePath,
           encoding: 'base64',
           success: function (rf) {
-            var imgOpts = { imageBase64: rf.data, sessionId: self._sessionId };
-            var imgInd = getApp().globalData.industry;
-            if (imgInd && imgInd.apiBase) {
-              imgOpts.baseOverride = imgInd.apiBase;
-              imgOpts.tokenOverride = imgInd.apiToken || '';
-              imgOpts.pathOverride = imgInd.aiPath || '';
-            }
-            api.aiMessage('', imgOpts).then(function (res) {
+            api.aiMessage('', { imageBase64: rf.data, sessionId: self._sessionId }).then(function (res) {
               self._handleAiResult(res);
             }).catch(function (err) {
               self._handleAiError(err);
@@ -1062,14 +1006,7 @@ Page({
       self.setData({ aiBusy: true, typing: true });
       self._scrollDown();
       if (self._serviceRestricted()) return;
-      // 外部行业语音上传走外部后端 /ai/voice
-      var vInd = getApp().globalData.industry;
-      var vOpts = { sessionId: self._sessionId };
-      if (vInd && vInd.apiBase) {
-        vOpts.baseOverride = vInd.apiBase;
-        vOpts.tokenOverride = vInd.apiToken || '';
-      }
-      api.aiVoice(res.tempFilePath, vOpts).then(function (data) {
+      api.aiVoice(res.tempFilePath, { sessionId: self._sessionId }).then(function (data) {
         self._handleAiResult(data);
       }).catch(function (err) {
         self._handleAiError(err);
@@ -1307,15 +1244,7 @@ Page({
     self._scrollDown();
     if (self._serviceRestricted()) return;
 
-    var app = getApp();
-    var ind = app.globalData.industry;
-    var msgOpts = { sessionId: self._sessionId };
-    if (ind && ind.apiBase) {
-      msgOpts.baseOverride = ind.apiBase;
-      msgOpts.tokenOverride = ind.apiToken || '';
-      msgOpts.pathOverride = ind.aiPath || '';
-    }
-    api.aiMessage(text, msgOpts).then(function (res) {
+    api.aiMessage(text, { sessionId: self._sessionId }).then(function (res) {
       self._handleAiResult(res);
     }).catch(function (err) {
       self._handleAiError(err);

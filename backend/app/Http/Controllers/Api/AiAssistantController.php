@@ -245,7 +245,7 @@ class AiAssistantController extends Controller
         $channelMap = [1 => 2, 2 => 1, 3 => 3, 4 => 2];
 
         return AiSession::create([
-            'store_id' => $request->user()->resolveStoreId(),
+            'store_id' => null,
             'user_id' => $request->user()->id,
             'channel' => $channelMap[$inputType] ?? 2,
             'status' => 1,
