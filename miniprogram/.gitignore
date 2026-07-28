@@ -1,0 +1,10 @@
+# WeChat DevTools generated
+node_modules/
+miniprogram_npm/
+.DS_Store
+
+# Local-only settings (the public project.config.json IS tracked)
+*.local.json
+
+# Editor / deploy config (contains server host & credentials)
+.vscode/

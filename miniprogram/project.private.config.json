@@ -1,0 +1,8 @@
+{
+  "description": "本地开发用配置；不进真机预览。urlCheck 关掉以便开发时绕开服务器域名校验。",
+  "setting": {
+    "urlCheck": false,
+    "compileHotReLoad": true
+  },
+  "projectname": "clawcn-template-miniprogram"
+}

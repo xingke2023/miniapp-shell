@@ -1,0 +1,10 @@
+/* global styles */
+page {
+  background: #F8F2ED;
+  color: #2A1F19;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: 28rpx;
+  -webkit-font-smoothing: antialiased;
+}
+
+button::after { border: none; }

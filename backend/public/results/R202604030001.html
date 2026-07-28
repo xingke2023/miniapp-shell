@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F01 · 查询当前库存 — 舌尖香港</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "PingFang HK", sans-serif; background: #f5f5f5; color: #222; }
+  header { background: #1a1a2e; color: #fff; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header .seq { font-size: 12px; color: #aaa; font-family: monospace; }
+  .meta { padding: 10px 32px; background: #fff; border-bottom: 1px solid #eee; font-size: 12px; color: #888; }
+  .container { padding: 24px 32px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  thead tr { background: #1a1a2e; color: #fff; }
+  thead th { padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 500; }
+  tbody tr { border-bottom: 1px solid #f0f0f0; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #fafafa; }
+  td { padding: 11px 16px; font-size: 14px; }
+  .qty { font-weight: 600; color: #1a1a2e; }
+  .low { color: #e94560; }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 3px; background: #e8f5e9; color: #2e7d32; }
+  .null { color: #bbb; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>舌尖香港 · F01 · 查询当前库存</h1>
+  <span class="seq">R202604030001.html</span>
+</header>
+<div class="meta">生成时间：2026-04-03 22:02:21</div>
+<div class="container">
+<table>
+<thead><tr><th>#</th><th>商品名称</th><th>单位</th><th>类型</th><th>当前库存</th><th>可用库存</th><th>最后进货</th><th>最后出库</th><th>最后销售</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>白菜</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty">102.6</td><td>102.6</td><td>03-20 09:22</td><td>03-31 05:27</td><td>03-31 05:22</td></tr>
+<tr><td>2</td><td>胡萝卜</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty">100</td><td>100</td><td>03-20 09:04</td><td>03-31 05:21</td><td>03-31 05:21</td></tr>
+<tr><td>3</td><td>土豆</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty">112.8</td><td>112.8</td><td>03-20 09:37</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>4</td><td>洋葱</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty">19.8</td><td>19.8</td><td>03-20 09:18</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>5</td><td>香葱</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty low">13.9</td><td>13.9</td><td>03-20 09:15</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>6</td><td>猪五花肉</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty">33.2</td><td>33.2</td><td>03-20 09:58</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>7</td><td>鸡胸肉</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty">28.6</td><td>28.6</td><td>03-20 09:58</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>8</td><td>鲈鱼</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty">22.5</td><td>22.5</td><td>03-20 09:27</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>9</td><td>豆腐</td><td>块</td><td><span class="tag">生鲜</span></td><td class="qty">61.2</td><td>61.2</td><td>03-20 09:40</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>10</td><td>橙子</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty">20.9</td><td>20.9</td><td>03-19 09:17</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>11</td><td>猪排骨</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty low">7.1</td><td>7.1</td><td>03-19 09:51</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>12</td><td>花蛤</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty low">11.7</td><td>11.7</td><td>03-18 09:39</td><td class="null">—</td><td class="null">—</td></tr>
+<tr><td>13</td><td>豆芽</td><td>斤</td><td><span class="tag">生鲜</span></td><td class="qty">18.7</td><td>18.7</td><td>03-18 09:03</td><td class="null">—</td><td class="null">—</td></tr>
+</tbody></table>
+</div>
+</body>
+</html>

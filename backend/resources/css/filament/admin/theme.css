@@ -1,0 +1,38 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../views/**/*.blade.php';
+@source '../../../../app/Filament/**/*.php';
+
+/*
+ * 修复：登录页等处 loading spinner 初始就一直转。
+ *
+ * vite.config.js 里为兼容微信 web-view 老内核加了 postcss-cascade-layers，
+ * 它把 Tailwind preflight 的 `img,svg,...{display:block}` 改写成
+ * `svg:not(#\#):not(#\#){display:block}`，优先级被抬到 (2,0,1)，
+ * 盖过了 Livewire 运行时内联注入的低优先级隐藏样式
+ * `[wire:loading][wire:loading]{display:none}` (0,2,0)，
+ * 导致 `wire:loading` 的 `.fi-loading-indicator` 被强制 display:block + 旋转动画 → 永久打转。
+ *
+ * 这里用同样的 :not(#\#) 把 wire:loading 的隐藏优先级抬到 (3,1,0) 压回去。
+ * 不加 !important —— 真正发请求时 Livewire 仍能用内联 style 把 spinner 显示出来。
+ */
+[wire\:loading]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.delay]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.delay\.none]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.delay\.shortest]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.delay\.shorter]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.delay\.short]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.delay\.default]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.delay\.long]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.delay\.longer]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.delay\.longest]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.inline]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.inline-flex]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.inline-block]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.block]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.flex]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.grid]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.table]:not(#\#):not(#\#):not(#\#),
+[wire\:loading\.list-item]:not(#\#):not(#\#):not(#\#) {
+    display: none;
+}

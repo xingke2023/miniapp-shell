@@ -1,0 +1,328 @@
+<view class="root">
+  <!-- Header -->
+  <view class="header" style="padding-top: {{statusBarHeight}}px;">
+    <view class="header-inner">
+      <view class="title-block">
+        <view class="title">{{appTitle}}</view>
+        <view class="subtitle">
+          <text class="dot"></text>
+          <text wx:if="{{user}}">{{user.name}}</text>
+          <text wx:if="{{user}}" class="logout-link" catchtap="onLogout">退出</text>
+          <text wx:else>{{logging ? '正在登录…' : '未登录'}}</text>
+        </view>
+      </view>
+      <view class="size-toggle">
+        <view
+          class="size-btn {{fontSize === 'sm' ? 'size-btn-active' : ''}}"
+          data-size="sm" bindtap="onFontSize" style="font-size: 22rpx;">A</view>
+        <view
+          class="size-btn {{fontSize === 'md' ? 'size-btn-active' : ''}}"
+          data-size="md" bindtap="onFontSize" style="font-size: 26rpx;">A</view>
+        <view
+          class="size-btn {{fontSize === 'lg' ? 'size-btn-active' : ''}}"
+          data-size="lg" bindtap="onFontSize" style="font-size: 32rpx;">A</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Messages -->
+  <scroll-view
+    class="msgs"
+    scroll-y="{{true}}"
+    scroll-into-view="{{scrollAnchor}}"
+    scroll-with-animation="{{true}}"
+    style="height: {{msgsHeight}}px;"
+    enhanced="{{true}}"
+    show-scrollbar="{{false}}"
+  >
+    <block wx:for="{{msgs}}" wx:key="id">
+      <!-- 快捷按钮行（主页展开，左右均匀分布） -->
+      <view wx:if="{{item.from === 'shortcuts'}}" class="shortcuts-row">
+        <view
+          wx:for="{{item.shortcuts}}"
+          wx:for-item="sc"
+          wx:key="key"
+          class="shortcut-chip"
+          hover-class="shortcut-chip--pressed"
+          hover-stay-time="100"
+          bindtap="onShortcutTap"
+          data-item="{{sc}}"
+        >
+          <image wx:if="{{sc.iconSvg}}" class="shortcut-icon" src="{{sc.iconSvg}}" mode="aspectFit"/>
+          <text wx:else class="shortcut-icon-fallback">{{sc.emoji}}</text>
+          <text class="shortcut-label">{{sc.label}}</text>
+        </view>
+      </view>
+
+      <view wx:elif="{{true}}" class="row row-{{item.from}}">
+        <!-- 打开网页链接按钮（如「打开完整库存页」） -->
+        <view
+          wx:if="{{item.weblink}}"
+          class="weblink-card"
+          hover-class="weblink-card--hover"
+          hover-stay-time="80"
+          bindtap="onWebLink"
+          data-url="{{item.weblink.url}}"
+        >
+          <text class="weblink-label">{{item.weblink.label}}</text>
+          <text class="weblink-chevron">›</text>
+        </view>
+
+        <!-- AI text bubble (markdown 块级渲染，列表用 flex 对齐) -->
+        <view
+          wx:elif="{{item.from === 'ai'}}"
+          class="bubble bubble-ai font-{{fontSize}}"
+        >
+          <block wx:for="{{item.blocks}}" wx:for-item="blk" wx:key="k">
+            <view wx:if="{{blk.type === 'h'}}" class="md-h md-h-{{blk.level}}">
+              <rich-text nodes="{{blk.html}}"></rich-text>
+            </view>
+            <view wx:elif="{{blk.type === 'li'}}" class="md-li">
+              <text class="md-marker {{blk.ordered ? 'md-marker-num' : 'md-marker-dot'}}" style="width:{{blk.markerWidth}};">{{blk.marker}}</text>
+              <rich-text class="md-li-text" nodes="{{blk.html}}"></rich-text>
+            </view>
+            <view wx:elif="{{blk.type === 'code'}}" class="md-code">
+              <text>{{blk.text}}</text>
+            </view>
+            <view wx:elif="{{blk.type === 'card'}}" class="ac-card">
+              <view wx:if="{{blk.data.title || blk.data.icon}}" class="ac-card-header">
+                <text wx:if="{{blk.data.icon}}" class="ac-card-icon">{{blk.data.icon}}</text>
+                <view class="ac-card-titles">
+                  <view wx:if="{{blk.data.title}}" class="ac-card-title">{{blk.data.title}}</view>
+                  <view wx:if="{{blk.data.subtitle}}" class="ac-card-subtitle">{{blk.data.subtitle}}</view>
+                </view>
+              </view>
+              <view wx:if="{{blk.data.fields && blk.data.fields.length}}" class="ac-card-fields">
+                <view wx:for="{{blk.data.fields}}" wx:for-item="field" wx:key="label" class="ac-card-row">
+                  <text class="ac-card-label">{{field.label}}</text>
+                  <text class="ac-card-value" style="{{field.color ? 'color:' + field.color + ';' : ''}}">{{field.value}}</text>
+                </view>
+              </view>
+              <view wx:if="{{blk.data.body}}" class="ac-card-body">{{blk.data.body}}</view>
+              <view wx:if="{{blk.data.actions && blk.data.actions.length}}" class="ac-card-actions">
+                <view wx:for="{{blk.data.actions}}" wx:for-item="action" wx:key="label"
+                      class="ac-btn ac-btn-{{action.kind || 'primary'}}"
+                      bindtap="onCardAction"
+                      data-intent="{{action.intent}}"
+                      data-payload="{{action.payload}}"
+                      data-label="{{action.label}}">
+                  {{action.label}}
+                </view>
+              </view>
+            </view>
+            <view wx:else class="md-p">
+              <rich-text nodes="{{blk.html}}"></rich-text>
+            </view>
+          </block>
+        </view>
+
+        <!-- User: type-specific renderers -->
+        <view wx:elif="{{item.type === 'image'}}" class="media-image">
+          <image
+            class="media-image-thumb"
+            src="{{item.tempPath || item.url}}"
+            mode="widthFix"
+            bindtap="onPreviewImage"
+            data-url="{{item.tempPath || item.url}}"
+            show-menu-by-longpress="{{true}}"
+          />
+          <view wx:if="{{item.uploading}}" class="media-overlay">上传中…</view>
+          <view wx:elif="{{item.error}}" class="media-overlay media-overlay--error">❌ {{item.error}}</view>
+        </view>
+
+        <view wx:elif="{{item.type === 'file'}}" class="media-file">
+          <view class="media-file-icon">📄</view>
+          <view class="media-file-meta">
+            <view class="media-file-name">{{item.name}}</view>
+            <view class="media-file-sub">
+              <text wx:if="{{item.uploading}}">上传中…</text>
+              <text wx:elif="{{item.error}}" style="color:#fff;">❌ {{item.error}}</text>
+              <text wx:else>{{item.size}} 字节</text>
+            </view>
+          </view>
+        </view>
+
+        <view
+          wx:elif="{{item.type === 'voice'}}"
+          class="media-voice"
+          bindtap="onPlayVoice"
+          data-url="{{item.url || item.tempPath}}"
+        >
+          <view class="media-voice-icon">🔊</view>
+          <view class="media-voice-bar">
+            <view class="media-voice-bar-fill"></view>
+          </view>
+          <view class="media-voice-duration">
+            <text wx:if="{{item.uploading}}">上传中…</text>
+            <text wx:elif="{{item.error}}">❌</text>
+            <text wx:else>{{item.duration}}″</text>
+          </view>
+        </view>
+
+        <!-- Plain user text bubble -->
+        <view
+          wx:else
+          class="bubble bubble-user font-{{fontSize}}"
+        >{{item.text}}</view>
+      </view>
+    </block>
+
+    <view wx:if="{{typing}}" class="row row-ai">
+      <view class="typing-bubble">
+        <view class="dot-anim dot-0"></view>
+        <view class="dot-anim dot-1"></view>
+        <view class="dot-anim dot-2"></view>
+      </view>
+    </view>
+
+    <view id="anchor-bottom" style="height: 1rpx;"></view>
+  </scroll-view>
+
+  <!-- Bottom input -->
+  <view class="bottom">
+    <view wx:if="{{!externalMode && !user && !logging}}" class="login-prompt">
+      <view class="login-tip">{{isRegisterMode ? '注册一个新账号' : '请用账号登录后开始聊天'}}</view>
+      <view class="login-card">
+        <view class="login-row">
+          <text class="login-row-label">账号</text>
+          <input
+            class="login-field"
+            placeholder="{{isRegisterMode ? '设置用户名（字母/数字/下划线）' : '用户名 / 邮箱'}}"
+            placeholder-class="login-ph"
+            value="{{loginForm.username}}"
+            data-field="username"
+            bindinput="onLoginInput"
+            confirm-type="next"
+          />
+        </view>
+        <view class="login-divider"></view>
+        <view class="login-row">
+          <text class="login-row-label">密码</text>
+          <input
+            class="login-field"
+            placeholder="{{isRegisterMode ? '设置密码（至少8位）' : '登录密码'}}"
+            placeholder-class="login-ph"
+            password="{{true}}"
+            value="{{loginForm.password}}"
+            data-field="password"
+            bindinput="onLoginInput"
+            confirm-type="done"
+            bindconfirm="onLogin"
+          />
+        </view>
+      </view>
+      <button class="btn-primary login-submit" bindtap="onLogin" disabled="{{logging}}">{{isRegisterMode ? '注册' : '登录'}}</button>
+      <text class="auth-mode-toggle" bindtap="onToggleRegisterMode">{{isRegisterMode ? '已有账号？去登录' : '没有账号？去注册'}}</text>
+    </view>
+
+    <view wx:elif="{{!externalMode && logging}}" class="login-prompt">
+      <view class="login-tip">正在为你登录…</view>
+    </view>
+
+    <view wx:else class="input-area">
+      <!-- Quick action chips menu -->
+      <scroll-view class="quick-actions" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+        <view class="qa-strip">
+          <view
+            wx:for="{{quickActions}}"
+            wx:key="key"
+            wx:if="{{!item.adminOnly || (user && user.is_admin)}}"
+            class="qa-chip qa-chip-{{item.key}}"
+            hover-class="qa-chip--pressed"
+            hover-stay-time="120"
+            bindtap="onQuickAction"
+            data-prompt="{{item.prompt}}"
+            data-key="{{item.key}}"
+          >
+            <text class="qa-label">{{item.label}}</text>
+            <text wx:if="{{item.items && item.items.length}}" class="qa-arrow {{reportMenuKey === item.key ? 'qa-arrow--open' : ''}}">›</text>
+            <view wx:if="{{item.badge}}" class="qa-badge">{{item.badge}}</view>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="input-row">
+        <!-- 语音模式切换（mediaEnabled 行业才显示） -->
+        <view wx:if="{{mediaEnabled}}" class="icon-btn" bindtap="toggleVoiceMode">
+          <image class="icon-svg" src="{{voiceMode ? icons.keyboard : icons.mic}}" mode="aspectFit" />
+        </view>
+
+        <!-- 中间：文本输入 或 按住说话 -->
+        <view wx:if="{{mediaEnabled && voiceMode}}"
+          class="hold-to-talk {{recording ? 'hold-to-talk--rec' : ''}}"
+          bindtouchstart="onVoiceStart"
+          bindtouchend="onVoiceEnd"
+          bindtouchcancel="onVoiceEnd"
+        >{{recording ? '松开发送' : '按住说话'}}</view>
+
+        <input wx:else
+          class="input"
+          placeholder="{{aiBusy ? 'AI 思考中…' : (externalMode ? '查库存、客户、订单…' : '随便聊聊，或问点什么…')}}"
+          value="{{chatInput}}"
+          bindinput="onInput"
+          confirm-type="send"
+          bindconfirm="onSend"
+          disabled="{{aiBusy}}"
+          cursor-spacing="20"
+          adjust-position="{{true}}"
+        />
+
+        <!-- "+" 展开媒体面板（拍照/相册/文件） -->
+        <view wx:if="{{mediaEnabled}}" class="icon-btn" bindtap="togglePlusMenu">
+          <image class="icon-svg" src="{{plusOpen ? icons.close : icons.plus}}" mode="aspectFit" />
+        </view>
+
+        <!-- 发送按钮：仅文本模式且有内容时显示 -->
+        <view wx:if="{{!voiceMode}}"
+          class="btn-send-mini {{(!chatInput || aiBusy) ? 'btn-send-mini--off' : ''}}"
+          bindtap="onSend"
+        >发送</view>
+      </view>
+
+      <!-- 经营报表 popover：锚定在 chip 正上方 -->
+      <view wx:if="{{reportMenuOpen}}" class="popover-mask" bindtap="closeReportMenu" catchtouchmove="noop">
+        <view class="popover" style="{{reportMenuStyle}}" catchtap="noop">
+          <view
+            wx:for="{{reportMenuItems}}"
+            wx:key="key"
+            class="popover-item"
+            bindtap="onReportItem"
+            data-prompt="{{item.prompt}}"
+            data-route="{{item.route}}"
+            data-external="{{item.external}}"
+          >
+            <image wx:if="{{item.iconSvg}}" class="popover-item-icon-svg" src="{{item.iconSvg}}" mode="aspectFit"/>
+            <view wx:else class="popover-item-emoji">{{item.emoji}}</view>
+            <view class="popover-item-texts">
+              <view class="popover-item-label">{{item.label}}</view>
+              <view wx:if="{{item.desc}}" class="popover-item-desc">{{item.desc}}</view>
+            </view>
+          </view>
+          <view class="popover-arrow" style="{{reportMenuArrowStyle}}"></view>
+        </view>
+      </view>
+
+      <!-- 媒体选择面板 -->
+      <view wx:if="{{plusOpen}}" class="plus-grid">
+        <view class="plus-item" bindtap="onPickImage" data-src="camera">
+          <view class="plus-icon">
+            <image class="plus-icon-svg" src="{{icons.camera}}" mode="aspectFit" />
+          </view>
+          <text class="plus-label">拍照</text>
+        </view>
+        <view class="plus-item" bindtap="onPickImage" data-src="album">
+          <view class="plus-icon">
+            <image class="plus-icon-svg" src="{{icons.album}}" mode="aspectFit" />
+          </view>
+          <text class="plus-label">相册</text>
+        </view>
+        <view class="plus-item" bindtap="onPickFile">
+          <view class="plus-icon">
+            <image class="plus-icon-svg" src="{{icons.file}}" mode="aspectFit" />
+          </view>
+          <text class="plus-label">文件</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

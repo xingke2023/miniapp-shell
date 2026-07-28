@@ -1,0 +1,22 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "clawcn-template-miniprogram",
+  "description": "ClawCN 助手小程序前端",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "enhance": false,
+    "postcss": true,
+    "minified": false,
+    "newFeature": true,
+    "autoAudits": false,
+    "useApiHook": true,
+    "useApiHostProcess": true,
+    "compileHotReLoad": true,
+    "useStaticServer": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.6.0",
+  "condition": {}
+}

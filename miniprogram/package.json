@@ -1,0 +1,9 @@
+{
+  "name": "clawcn-template-miniprogram",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ClawCN 助手小程序",
+  "dependencies": {
+    "@babel/runtime": "^7.24.0"
+  }
+}

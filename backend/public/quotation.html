@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>企业AI落地行业应用 · 报价方案</title>
+<style>
+  /* ── 基础 ───────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --brand: #E65C46;
+    --brand-dark: #C44832;
+    --ink: #1a1a2e;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f8f9fb;
+    --card: #ffffff;
+    --green: #059669;
+    --blue: #2563eb;
+    --purple: #7c3aed;
+  }
+  html { font-size: 14px; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.65;
+  }
+  a { color: var(--brand); text-decoration: none; }
+
+  /* ── 版心 ─────────────────────────────────────── */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  /* ── 封面 header ──────────────────────────────── */
+  .cover {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 55%, #0f3460 100%);
+    color: #fff;
+    padding: 52px 48px 44px;
+    border-radius: 0 0 24px 24px;
+    position: relative;
+    overflow: hidden;
+    margin: 0 -24px 40px;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(230,92,70,.35) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover-badge {
+    display: inline-block;
+    background: rgba(230,92,70,.2);
+    border: 1px solid rgba(230,92,70,.5);
+    color: #f8c5bb;
+    font-size: 11px;
+    letter-spacing: .08em;
+    padding: 3px 10px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+  }
+  .cover-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+  .cover-title span { color: #f87c65; }
+  .cover-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,.65);
+    margin-bottom: 28px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item { font-size: 12px; color: rgba(255,255,255,.5); }
+  .cover-meta-item strong { display: block; color: rgba(255,255,255,.85); font-size: 13px; }
+  .cover-demo {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 20px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 16px;
+    padding: 12px 18px;
+    font-size: 13px;
+    color: rgba(255,255,255,.75);
+  }
+  .cover-demo-qr {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    background: #fff;
+    padding: 3px;
+  }
+  .cover-demo-info { display: flex; flex-direction: column; gap: 6px; }
+  .cover-demo-scan { font-size: 11px; color: rgba(255,255,255,.45); }
+  .cover-demo-name {
+    font-weight: 700;
+    color: #fff;
+    background: rgba(230,92,70,.25);
+    border: 1px solid rgba(230,92,70,.5);
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-size: 13px;
+  }
+  .cover-demo-tip { color: rgba(255,255,255,.5); font-size: 12px; }
+
+  /* ── section 标题 ─────────────────────────────── */
+  .sec-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 36px 0 16px;
+    color: var(--ink);
+  }
+  .sec-title::before {
+    content: '';
+    width: 4px; height: 20px;
+    background: var(--brand);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── 产品概述卡片 ──────────────────────────────── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .overview-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+  .overview-card .oc-icon { font-size: 26px; margin-bottom: 8px; }
+  .overview-card .oc-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .overview-card .oc-desc { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+  /* ── 产品概述文字 ─────────────────────────────── */
+  .overview-text {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--brand);
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-size: 14.5px;
+    color: #374151;
+    line-height: 1.9;
+  }
+  .overview-text strong { color: var(--brand-dark); }
+
+  /* ── 行业卡片 ─────────────────────────────────── */
+  .industry-list { display: flex; flex-direction: column; gap: 12px; }
+  .ind-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: 16px;
+    align-items: start;
+  }
+  .ind-card.flagship {
+    border-color: #fdba74;
+    background: linear-gradient(to right, #fffbf7, #fff);
+    box-shadow: 0 2px 12px rgba(230,92,70,.08);
+  }
+  .ind-head { display: flex; align-items: center; gap: 10px; }
+  .ind-emoji { font-size: 22px; flex-shrink: 0; }
+  .ind-name { font-size: 15px; font-weight: 700; }
+  .ind-tagline { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .ind-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .badge-flagship { background: #fef3c7; color: #92400e; }
+  .badge-full { background: #d1fae5; color: #065f46; }
+  .badge-ai { background: #ede9fe; color: #5b21b6; }
+  .badge-external { background: #dbeafe; color: #1e40af; }
+
+  .ind-features { }
+  .ind-features ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+  }
+  .ind-features ul li {
+    font-size: 11.5px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    padding: 3px 9px;
+    border-radius: 6px;
+    color: #374151;
+  }
+  .ind-features ul li.key { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+
+  .ind-price { text-align: right; white-space: nowrap; }
+  .price-from { font-size: 10px; color: var(--muted); }
+  .price-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--brand);
+    line-height: 1.2;
+  }
+  .price-unit { font-size: 11px; color: var(--muted); }
+  .price-note { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+  /* ── 套餐对比表 ───────────────────────────────── */
+  .plan-table-wrap { overflow-x: auto; }
+  .plan-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .plan-table thead th {
+    padding: 14px 16px;
+    text-align: center;
+    font-weight: 700;
+    border-bottom: 2px solid var(--line);
+    background: var(--bg);
+  }
+  .plan-table thead th:first-child { text-align: left; }
+  .plan-table thead th.col-popular {
+    background: linear-gradient(135deg, #fff7ed, #fff1eb);
+    color: var(--brand-dark);
+    position: relative;
+  }
+  .popular-tag {
+    display: inline-block;
+    background: var(--brand);
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 99px;
+    margin-left: 6px;
+    font-weight: 600;
+  }
+  .plan-table tbody td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+    text-align: center;
+  }
+  .plan-table tbody td:first-child { text-align: left; font-weight: 500; color: #374151; }
+  .plan-table tbody tr:last-child td { border-bottom: none; }
+  .plan-table tbody tr:hover td { background: #fafafa; }
+  .check { color: var(--green); font-size: 16px; }
+  .cross { color: #d1d5db; font-size: 16px; }
+  .plan-price-cell { font-weight: 800; font-size: 17px; }
+  .plan-price-cell.c1 { color: #374151; }
+  .plan-price-cell.c2 { color: var(--brand); }
+  .plan-price-cell.c3 { color: var(--purple); }
+  .plan-price-sub { font-size: 10px; font-weight: 400; color: var(--muted); display: block; }
+  .plan-table .row-head td {
+    background: #f9fafb;
+    font-weight: 700;
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding: 8px 16px;
+  }
+
+  /* ── 实施说明 ─────────────────────────────────── */
+  .impl-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .impl-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 14px;
+    text-align: center;
+  }
+  .impl-step { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .impl-icon { font-size: 22px; margin-bottom: 6px; }
+  .impl-label { font-size: 13px; font-weight: 600; }
+  .impl-desc { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+  /* ── 备注 ─────────────────────────────────────── */
+  .note-box {
+    background: #fffbf5;
+    border: 1px solid #fed7aa;
+    border-left: 4px solid var(--brand);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 12.5px;
+    color: #78350f;
+    line-height: 1.8;
+  }
+  .note-box h4 { font-size: 13px; margin-bottom: 8px; color: var(--brand-dark); }
+  .note-box ol { padding-left: 18px; }
+  .note-box ol li + li { margin-top: 4px; }
+
+  /* ── 页脚 ─────────────────────────────────────── */
+  .doc-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  /* ── 移动端适配 ──────────────────────────────── */
+  @media (max-width: 640px) {
+    html { font-size: 13px; }
+    .page { padding: 0 14px 40px; }
+
+    /* 封面 */
+    .cover { padding: 36px 20px 28px; margin: 0 -14px 28px; border-radius: 0 0 18px 18px; }
+    .cover-title { font-size: 22px; }
+    .cover-sub { font-size: 13px; margin-bottom: 20px; }
+    .cover-meta { gap: 16px; }
+    .cover-meta-item { font-size: 11px; }
+    .cover-demo { font-size: 12px; padding: 7px 14px; gap: 6px; flex-wrap: wrap; }
+    .cover-demo-name { font-size: 12px; }
+
+    /* 产品概述：3列→2列 */
+    .overview-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+    /* 行业卡片：3列→单列堆叠 */
+    .ind-card {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    .ind-price { text-align: left; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    .price-from { order: -1; }
+    .price-num { font-size: 20px; }
+    .price-note { width: 100%; }
+
+    /* 套餐表：缩小字号，第一列固定窄一点 */
+    .plan-table { font-size: 11.5px; }
+    .plan-table thead th { padding: 10px 8px; font-size: 12px; }
+    .plan-table tbody td { padding: 9px 8px; font-size: 11.5px; }
+    .plan-price-cell { font-size: 14px; }
+
+    /* 实施流程：4列→2列 */
+    .impl-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .impl-card { padding: 14px 10px; }
+
+    /* 页脚堆叠 */
+    .doc-footer { flex-direction: column; gap: 6px; text-align: center; }
+
+    .sec-title { font-size: 16px; margin: 28px 0 12px; }
+    .note-box { padding: 14px 16px; }
+  }
+
+  /* ── 打印样式 ─────────────────────────────────── */
+  @media print {
+    @page {
+      size: A4;
+      margin: 14mm 12mm 14mm 12mm;
+    }
+    body { background: #fff; font-size: 12px; }
+    .cover { border-radius: 0; margin: -14mm -12mm 32px; padding: 36px 36px 30px; }
+    .cover::before { display: none; }
+    .ind-card, .overview-card, .impl-card, .plan-table { break-inside: avoid; }
+    .sec-title { break-after: avoid; }
+    .page { padding: 0; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ 封面 ══ -->
+  <div class="cover">
+    <div class="cover-badge">AI 行业解决方案 · 报价方案</div>
+    <div class="cover-title">企业 AI 落地<span>行业应用</span>部署方案</div>
+    <div class="cover-sub">微信小程序 + 后台管理 + AI 助手 · 分行业私有化/SaaS 部署</div>
+    <div class="cover-meta">
+      <div class="cover-meta-item"><strong>文档日期</strong>2026 年 06 月</div>
+      <div class="cover-meta-item"><strong>版本</strong>V2.0</div>
+      <div class="cover-meta-item"><strong>覆盖行业</strong>11 个行业场景</div>
+      <div class="cover-meta-item"><strong>咨询微信</strong>18603546191</div>
+    </div>
+    <div class="cover-demo">
+      <img src="/miniprogram-qr.png" class="cover-demo-qr" alt="小程序码" />
+      <div class="cover-demo-info">
+        <div class="cover-demo-scan">扫码体验小程序</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span>微信搜索</span>
+          <span class="cover-demo-name">企业AI办公助手</span>
+          <span class="cover-demo-tip">即可体验</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 一、产品概述 ══ -->
+  <div class="sec-title">一、产品概述</div>
+  <div class="overview-text">
+    我们深入梳理企业现有的业务流程与操作习惯，将其与 AI 能力深度融合，为不同行业量身定制一整套 AI 解决方案。无论是门店日常的进销存管理、销售数据录入，还是客户跟进、员工协同，均可通过自然语言对话、语音或拍照的方式完成，彻底告别繁琐的手工录入。方案以微信小程序为交互入口，配套完整的后台管理系统，数据实时同步、报表自动生成，让 AI 真正融入每一个业务环节——<strong>不是改变你的工作方式，而是让工作更轻松地完成</strong>。
+  </div>
+
+  <!-- ══ 二、分行业功能与报价 ══ -->
+  <div class="sec-title">二、分行业功能说明与报价</div>
+
+  <div class="industry-list">
+
+    <!-- 生鲜门店 -->
+    <div class="ind-card flagship">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">🥬</span>
+          <div>
+            <div class="ind-name">生鲜门店</div>
+            <div class="ind-tagline">果蔬肉禽 · 全链路管理</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-flagship">旗舰行业</span>
+        <span class="ind-badge badge-full">完整后端链路</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">AI 自然语言录入库存</li>
+          <li class="key">进货单管理（拍照识别）</li>
+          <li class="key">销售补录 / 售罄上报</li>
+          <li class="key">损耗记录 + 供应商退款</li>
+          <li>每日库存快照</li>
+          <li>进销存完整数据链</li>
+          <li>销售汇总报表</li>
+          <li>语音识别录入</li>
+          <li>今日运营概览</li>
+          <li>进货建议（7日算法）</li>
+          <li>供应商管理</li>
+          <li>Filament 后台管理</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥3,980</div>
+        <div class="price-unit">/ 年 / 门店</div>
+        <div class="price-note">多店另议</div>
+      </div>
+    </div>
+
+    <!-- 进销存及CRM -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">📊</span>
+          <div>
+            <div class="ind-name">进销存及 CRM</div>
+            <div class="ind-tagline">商品 · 采购 · 销售 · 客户</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-external">独立后端接入</span>
+        <span class="ind-badge badge-ai">AI 驱动</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">进销存全流程</li>
+          <li class="key">CRM 客户管理</li>
+          <li class="key">线索 / 商机跟进</li>
+          <li>订单管理</li>
+          <li>AI 自然语言录入</li>
+          <li>外部后端独立部署</li>
+          <li>小程序快捷入口</li>
+          <li>数据报表</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥4,980</div>
+        <div class="price-unit">/ 年</div>
+        <div class="price-note">含独立部署</div>
+      </div>
+    </div>
+
+    <!-- 餐饮快餐 -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">🍜</span>
+          <div>
+            <div class="ind-name">餐饮快餐</div>
+            <div class="ind-tagline">点餐 · 营业额 · 备料</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-ai">AI 菜单助手</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">AI 营业额录入</li>
+          <li class="key">备料 / 损耗上报</li>
+          <li>每日营业数据汇总</li>
+          <li>菜品库存管理</li>
+          <li>语音快捷录入</li>
+          <li>营业报表</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥1,980</div>
+        <div class="price-unit">/ 年 / 门店</div>
+      </div>
+    </div>
+
+    <!-- 服装零售 -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">👕</span>
+          <div>
+            <div class="ind-name">服装零售</div>
+            <div class="ind-tagline">上新 · 库存 · 销售 · 会员</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-ai">AI 服装店长</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">新款上新录入</li>
+          <li class="key">会员积分管理</li>
+          <li>SKU 库存管理</li>
+          <li>销售数据统计</li>
+          <li>AI 自然语言录入</li>
+          <li>促销活动管理</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥1,980</div>
+        <div class="price-unit">/ 年 / 门店</div>
+      </div>
+    </div>
+
+    <!-- 便利超市 -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">🏪</span>
+          <div>
+            <div class="ind-name">便利超市</div>
+            <div class="ind-tagline">进货 · 库存 · 销售 · 促销</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-ai">AI 便利店长</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">进货 / 库存管理</li>
+          <li class="key">促销活动管理</li>
+          <li>商品销售统计</li>
+          <li>临期预警</li>
+          <li>AI 语音录入</li>
+          <li>每日营收报表</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥1,980</div>
+        <div class="price-unit">/ 年 / 门店</div>
+      </div>
+    </div>
+
+    <!-- 美业服务 -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">💇</span>
+          <div>
+            <div class="ind-name">美业服务</div>
+            <div class="ind-tagline">预约 · 会员 · 消费 · 员工</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-ai">AI 美业管家</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">预约管理</li>
+          <li class="key">会员卡 / 储值管理</li>
+          <li>消费记录</li>
+          <li>员工业绩统计</li>
+          <li>客户跟进提醒</li>
+          <li>AI 快捷录入</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥1,980</div>
+        <div class="price-unit">/ 年 / 门店</div>
+      </div>
+    </div>
+
+    <!-- 制造业 -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">🏭</span>
+          <div>
+            <div class="ind-name">制造业</div>
+            <div class="ind-tagline">订单 · 产能 · 物料 · 排程</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-ai">AI 生产助手</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">生产订单管理</li>
+          <li class="key">物料 BOM 录入</li>
+          <li>产能排程</li>
+          <li>工序进度跟踪</li>
+          <li>良率 / 损耗上报</li>
+          <li>AI 语音录入</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥2,980</div>
+        <div class="price-unit">/ 年</div>
+      </div>
+    </div>
+
+    <!-- 保险 -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">🛡️</span>
+          <div>
+            <div class="ind-name">保险</div>
+            <div class="ind-tagline">保单 · 客户 · 续保 · 业绩</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-ai">AI 保险助手</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">保单录入 / 查询</li>
+          <li class="key">续保提醒</li>
+          <li>客户档案管理</li>
+          <li>业绩 KPI 统计</li>
+          <li>AI 对话辅助</li>
+          <li>话术模板库</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥1,980</div>
+        <div class="price-unit">/ 年 / 坐席</div>
+      </div>
+    </div>
+
+    <!-- 金融 -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">💰</span>
+          <div>
+            <div class="ind-name">金融</div>
+            <div class="ind-tagline">账户 · 对账 · 客户 · 风控</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-ai">AI 金融助手</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">账户流水录入</li>
+          <li class="key">自动对账提醒</li>
+          <li>客户资产概览</li>
+          <li>风控规则配置</li>
+          <li>AI 合规问答</li>
+          <li>报表导出</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥2,980</div>
+        <div class="price-unit">/ 年 / 坐席</div>
+      </div>
+    </div>
+
+    <!-- 电商 -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">🛒</span>
+          <div>
+            <div class="ind-name">电商</div>
+            <div class="ind-tagline">订单 · 库存 · 退款 · 客服</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-ai">AI 电商助手</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">多平台订单汇总</li>
+          <li class="key">售后退款处理</li>
+          <li>仓库库存管理</li>
+          <li>智能客服话术</li>
+          <li>物流跟踪</li>
+          <li>GMV 数据看板</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥1,980</div>
+        <div class="price-unit">/ 年 / 店铺</div>
+      </div>
+    </div>
+
+    <!-- 跨境电商 -->
+    <div class="ind-card">
+      <div>
+        <div class="ind-head">
+          <span class="ind-emoji">🌐</span>
+          <div>
+            <div class="ind-name">跨境电商</div>
+            <div class="ind-tagline">文案 · 翻译 · Listing · 侵权</div>
+          </div>
+        </div>
+        <span class="ind-badge badge-ai">AI 跨境助手</span>
+      </div>
+      <div class="ind-features">
+        <ul>
+          <li class="key">AI 五点文案生成</li>
+          <li class="key">多语言翻译</li>
+          <li>侵权关键词检测</li>
+          <li>Listing 优化建议</li>
+          <li>竞品分析</li>
+          <li>Review 管理</li>
+        </ul>
+      </div>
+      <div class="ind-price">
+        <div class="price-from">年费起</div>
+        <div class="price-num">¥1,980</div>
+        <div class="price-unit">/ 年 / 账号</div>
+      </div>
+    </div>
+
+  </div><!-- /industry-list -->
+
+  <!-- ══ 三、套餐对比 ══ -->
+  <div class="sec-title">三、部署套餐对比</div>
+  <div class="plan-table-wrap">
+    <table class="plan-table">
+      <thead>
+        <tr>
+          <th style="width:30%">功能 / 服务项</th>
+          <th>基础版<div style="font-size:12px;font-weight:400;color:#6b7280;">SaaS 共享</div></th>
+          <th class="col-popular">标准版 <span class="popular-tag">推荐</span><div style="font-size:12px;font-weight:400;">SaaS 独立</div></th>
+          <th>企业版<div style="font-size:12px;font-weight:400;color:#6b7280;">私有化</div></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-head"><td colspan="4">定价</td></tr>
+        <tr>
+          <td>年费</td>
+          <td><span class="plan-price-cell c1">¥1,980<span class="plan-price-sub">/ 行业 / 年</span></span></td>
+          <td><span class="plan-price-cell c2">¥3,980<span class="plan-price-sub">/ 行业 / 年</span></span></td>
+          <td><span class="plan-price-cell c3">面议<span class="plan-price-sub">私有化一次性 + 维护费</span></span></td>
+        </tr>
+        <tr>
+          <td>门店 / 账号数量</td>
+          <td>1 个</td>
+          <td>最多 5 个</td>
+          <td>无限制</td>
+        </tr>
+
+        <tr class="row-head"><td colspan="4">小程序与 AI</td></tr>
+        <tr>
+          <td>微信小程序入口</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td>AI 文字对话录入</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td>语音录入</td>
+          <td><span class="cross">—</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td>图片 / 拍照识别</td>
+          <td><span class="cross">—</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+
+        <tr class="row-head"><td colspan="4">后台管理</td></tr>
+        <tr>
+          <td>Filament 管理后台</td>
+          <td><span class="cross">—</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td>数据导出（Excel/CSV）</td>
+          <td><span class="cross">—</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td>员工 / 角色管理</td>
+          <td><span class="cross">—</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+
+        <tr class="row-head"><td colspan="4">部署与集成</td></tr>
+        <tr>
+          <td>部署方式</td>
+          <td>共享云服务</td>
+          <td>独立子域名</td>
+          <td>客户服务器</td>
+        </tr>
+        <tr>
+          <td>数据隔离</td>
+          <td>逻辑隔离</td>
+          <td>独立数据库</td>
+          <td>完全私有</td>
+        </tr>
+        <tr>
+          <td>API 对接 / Webhook</td>
+          <td><span class="cross">—</span></td>
+          <td>只读 API</td>
+          <td>完整 API</td>
+        </tr>
+        <tr>
+          <td>品牌定制（Logo / 名称）</td>
+          <td><span class="cross">—</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td>源码交付</td>
+          <td><span class="cross">—</span></td>
+          <td><span class="cross">—</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+
+        <tr class="row-head"><td colspan="4">服务与支持</td></tr>
+        <tr>
+          <td>部署周期</td>
+          <td>1 个工作日</td>
+          <td>3 个工作日</td>
+          <td>7–15 个工作日</td>
+        </tr>
+        <tr>
+          <td>技术支持</td>
+          <td>工单（48h响应）</td>
+          <td>微信群（24h响应）</td>
+          <td>专属对接（4h响应）</td>
+        </tr>
+        <tr>
+          <td>免费培训</td>
+          <td><span class="cross">—</span></td>
+          <td>线上 1 次</td>
+          <td>线上 + 上门</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ 四、实施流程 ══ -->
+  <div class="sec-title">四、实施流程</div>
+  <div class="impl-grid">
+    <div class="impl-card">
+      <div class="impl-step">第 1 步</div>
+      <div class="impl-icon">📋</div>
+      <div class="impl-label">需求确认</div>
+      <div class="impl-desc">确认行业 · 门店数量<br/>功能模块 · 套餐选择</div>
+    </div>
+    <div class="impl-card">
+      <div class="impl-step">第 2 步</div>
+      <div class="impl-icon">⚙️</div>
+      <div class="impl-label">环境部署</div>
+      <div class="impl-desc">服务器初始化<br/>域名 SSL 配置<br/>数据库初始化</div>
+    </div>
+    <div class="impl-card">
+      <div class="impl-step">第 3 步</div>
+      <div class="impl-icon">🎨</div>
+      <div class="impl-label">品牌配置</div>
+      <div class="impl-desc">Logo / 名称替换<br/>行业菜单按钮配置<br/>AI 系统提示词调优</div>
+    </div>
+    <div class="impl-card">
+      <div class="impl-step">第 4 步</div>
+      <div class="impl-icon">🚀</div>
+      <div class="impl-label">上线交付</div>
+      <div class="impl-desc">小程序审核提交<br/>操作培训<br/>正式投入使用</div>
+    </div>
+  </div>
+
+  <!-- ══ 五、备注说明 ══ -->
+  <div class="sec-title">五、备注说明</div>
+  <div class="note-box">
+    <h4>报价说明</h4>
+    <ol>
+      <li>以上报价均为<strong>软件服务年费</strong>，不含服务器费用（基础版共享，标准版/企业版按实际用量另计）。</li>
+      <li>生鲜门店行业为完整后端链路产品，含进销存 · 损耗 · 进货单 · AI 识别全链路，定价高于其他行业。</li>
+      <li>进销存及 CRM 行业为独立后端部署，需额外配置独立服务器，价格含首年基础部署费。</li>
+      <li>多行业 / 多门店组合部署可享受 <strong>8 折</strong>优惠，3 个行业以上联系商务洽谈专项方案。</li>
+      <li>企业版私有化报价根据服务器规格、定制功能量、行业数量面议；一次性买断含首年维护，次年维护费为软件费的 <strong>20%</strong>。</li>
+      <li>所有套餐含微信小程序审核协助，但企业微信认证 / 微信支付商户号申请由客户自行办理。</li>
+      <li>报价有效期 <strong>30 天</strong>，逾期请重新确认。</li>
+    </ol>
+  </div>
+
+  <!-- ══ 页脚 ══ -->
+  <div class="doc-footer">
+    <div>
+      <strong>环宇数据 · AI 行业解决方案</strong> &nbsp;|&nbsp; 咨询微信：18603546191
+    </div>
+    <div style="text-align:right;">
+      📱 微信搜索小程序 <strong style="color:var(--brand);">企业AI办公助手</strong> 体验演示<br/>
+      <span style="font-size:11px;">本报价单仅供参考，最终价格以合同为准</span>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
