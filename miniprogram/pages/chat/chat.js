@@ -1231,12 +1231,7 @@ Page({
   },
 
   _serviceRestricted: function () {
-    var ind = getApp().globalData.industry || {};
-    if (ind.apiBase) return false;
-    if (ind.slug === 'fresh') return false;
-    this.setData({ aiBusy: false, typing: false });
-    this._pushAi('服务暂未开通，请联系客服开通');
-    return true;
+    return false;
   },
 
   _pushAi: function (text, delay) {
