@@ -619,22 +619,12 @@ Page({
         return Object.assign({}, a, { iconSvg: svg });
       });
       self.setData({ quickActions: list });
-      // 首次加载：提取 shortcuts 存起来，由 _greetLoggedIn 在问候语之后推入
+      // 首次加载：将主菜单按钮作为聊天内联快捷行，由 _greetLoggedIn 在问候语之后推入
       if (!self._initShortcuts) {
-        for (var i = 0; i < list.length; i++) {
-          if (list[i].shortcuts && list[i].shortcuts.length) {
-            self._initShortcuts = list[i].shortcuts.map(function (it) {
-              var iconKey = EMOJI_ICON_MAP[it.emoji];
-              var svg = iconKey ? (ICONS_BLUE[iconKey] || ICONS[iconKey]) : '';
-              return Object.assign({}, it, { iconSvg: svg });
-            });
-            // 若问候语已推完在等快捷行，立即补推
-            if (self._shortcutsPending) {
-              self._shortcutsPending = false;
-              self._pushShortcuts(self._initShortcuts);
-            }
-            break;
-          }
+        self._initShortcuts = list;
+        if (self._shortcutsPending) {
+          self._shortcutsPending = false;
+          self._pushShortcuts(self._initShortcuts);
         }
       }
       wx.nextTick(function () { self._recomputeMsgsHeight(); });

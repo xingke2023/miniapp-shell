@@ -45,8 +45,9 @@
           class="shortcut-chip"
           hover-class="shortcut-chip--pressed"
           hover-stay-time="100"
-          bindtap="onShortcutTap"
-          data-item="{{sc}}"
+          bindtap="onQuickAction"
+          data-key="{{sc.key}}"
+          data-prompt="{{sc.prompt}}"
         >
           <image wx:if="{{sc.iconSvg}}" class="shortcut-icon" src="{{sc.iconSvg}}" mode="aspectFit"/>
           <text wx:else class="shortcut-icon-fallback">{{sc.emoji}}</text>
