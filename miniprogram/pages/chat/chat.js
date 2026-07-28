@@ -711,8 +711,9 @@ Page({
     for (var i = 0; i < list.length; i++) {
       if (list[i].key === key) { action = list[i]; break; }
     }
-    if (action && action.shortcuts && action.shortcuts.length) {
-      this._pushShortcuts(action.shortcuts);
+    // shortcuts 类型：有子项则推子项；无子项（如首页）则重推初始快捷行，让导航按钮重新出现在对话底部
+    if (action && Array.isArray(action.shortcuts)) {
+      this._pushShortcuts(action.shortcuts.length ? action.shortcuts : (this._initShortcuts || []));
       return;
     }
     if (action && action.items && action.items.length) {
