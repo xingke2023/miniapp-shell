@@ -507,17 +507,7 @@ Page({
 
     this._sessionId = null;
 
-    if (!app.globalData.industry) {
-      app.globalData.industry = { slug: 'fresh' };
-    }
-    var ind = app.globalData.industry;
-    // 外部行业（如进销存及CRM）：菜单/标题/接口走外部后端（app2），是纯菜单启动器，
-    // 无 AI、不依赖本项目登录；隐藏输入框/登录表单，菜单按钮 web-view 打开外部页。
-    var externalMode = !!(ind && ind.apiBase);
-    // mediaEnabled：聊天是否显示语音/拍照/相册/文件输入。
-    // 本地行业(生鲜)默认开；外部行业(如进销存CRM)需 ai_media=true 才开。
-    var mediaEnabled = !externalMode || !!(ind && ind.aiMedia);
-    this.setData({ externalMode: externalMode, mediaEnabled: mediaEnabled });
+    this.setData({ externalMode: false, mediaEnabled: true });
 
     // 标题优先用所选行业的品牌标题（app_config 作兜底默认）
     if (ind.title) {
@@ -580,21 +570,8 @@ Page({
   },
 
   // 拉取应用配置（标题等）；失败则保留 data 里的默认标题。
-  // 若已选行业且带品牌标题，则以行业标题为准，不被全局 miniprogram_title 覆盖。
   _loadAppConfig: function () {
     var self = this;
-    var ind = getApp().globalData.industry;
-    // 外部行业：标题由外部后端（app2）设置，从其 app-config 拉取
-    if (ind && ind.apiBase) {
-      api.appConfig(ind.apiBase).then(function (res) {
-        var cfg = (res && res.data) || {};
-        if (cfg.miniprogram_title) {
-          self.setData({ appTitle: cfg.miniprogram_title });
-        }
-      }).catch(function () { /* 保留行业默认标题 */ });
-      return;
-    }
-    if (ind && ind.title) { return; } // 行业标题优先，跳过全局配置
     api.appConfig().then(function (res) {
       var cfg = (res && res.data) || {};
       if (cfg.miniprogram_title) {
@@ -603,13 +580,10 @@ Page({
     }).catch(function () { /* 保留默认标题 */ });
   },
 
-  // 从后台拉取底部快捷按钮配置（按所选行业过滤）；失败/空则保留 data 里写死的默认数组（避免空白）
+  // 从后台拉取底部快捷按钮配置；失败/空则保留 data 里写死的默认数组（避免空白）
   _loadQuickActions: function () {
     var self = this;
-    var ind = getApp().globalData.industry;
-    var slug = (ind && ind.slug) || '';
-    var base = (ind && ind.apiBase) || ''; // 外部行业把菜单请求指向 app2
-    api.quickActions(slug, base).then(function (res) {
+    api.quickActions('', '').then(function (res) {
       var list = res && res.data;
       if (!list || !list.length) { return; }
       // 给每个主菜单胶囊注入 iconSvg（按 emoji 查对应 SVG）

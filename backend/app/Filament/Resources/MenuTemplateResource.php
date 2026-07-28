@@ -20,6 +20,8 @@ class MenuTemplateResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|\UnitEnum|null $navigationGroup = '系统';
 
     protected static ?string $navigationLabel = '菜单模版';
