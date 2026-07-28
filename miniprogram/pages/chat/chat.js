@@ -619,12 +619,15 @@ Page({
         return Object.assign({}, a, { iconSvg: svg });
       });
       self.setData({ quickActions: list });
-      // 首次加载：将主菜单按钮作为聊天内联快捷行，由 _greetLoggedIn 在问候语之后推入
+      // 首次加载：showInChat=true 的按钮作为聊天内联快捷行，由 _greetLoggedIn 在问候语之后推入
       if (!self._initShortcuts) {
-        self._initShortcuts = list;
-        if (self._shortcutsPending) {
-          self._shortcutsPending = false;
-          self._pushShortcuts(self._initShortcuts);
+        var chatBtns = list.filter(function (a) { return !!a.showInChat; });
+        if (chatBtns.length) {
+          self._initShortcuts = chatBtns;
+          if (self._shortcutsPending) {
+            self._shortcutsPending = false;
+            self._pushShortcuts(self._initShortcuts);
+          }
         }
       }
       wx.nextTick(function () { self._recomputeMsgsHeight(); });

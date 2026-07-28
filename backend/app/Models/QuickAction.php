@@ -19,6 +19,7 @@ class QuickAction extends Model
         'target_title',
         'web_label',
         'admin_only',
+        'show_in_chat',
         'store_id',
         'industry',
         'menu_template_id',
@@ -30,6 +31,7 @@ class QuickAction extends Model
     {
         return [
             'admin_only' => 'boolean',
+            'show_in_chat' => 'boolean',
             'enabled' => 'boolean',
             'sort_order' => 'integer',
         ];
@@ -65,6 +67,10 @@ class QuickAction extends Model
 
         if ($this->admin_only) {
             $node['adminOnly'] = true;
+        }
+
+        if ($this->show_in_chat) {
+            $node['showInChat'] = true;
         }
 
         switch ($this->action_type) {
