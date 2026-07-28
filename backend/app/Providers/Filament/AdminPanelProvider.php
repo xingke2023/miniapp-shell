@@ -30,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('舌尖香港门店AI助手')
+            ->brandName('AI助手后台管理')
             ->brandLogo(null)
             ->brandLogoHeight('2.5rem')
             ->viteTheme('resources/css/filament/admin/theme.css')
