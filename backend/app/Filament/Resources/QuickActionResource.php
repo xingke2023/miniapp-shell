@@ -48,10 +48,13 @@ class QuickActionResource extends Resource
                     ->options([
                         'prompt'        => '发文字给 AI',
                         'web'           => 'AI 摘要 + 打开网页',
-                        'open'          => '打开网页',
-                        'external_open' => '打开外部网站（带登录 token）',
+                        'open'          => '打开网页（带 token）',
+                        'external_open' => '打开外部网站（带 token）',
                         'menu'          => '弹出子菜单',
                         'shortcuts'     => '展开快捷按钮到聊天区',
+                        'home'          => '返回首页（reLaunch）',
+                        'route'         => '跳转小程序原生页',
+                        'external'      => '打开外部网站（不带 token）',
                     ])
                     ->default('prompt')
                     ->required()
@@ -66,12 +69,12 @@ class QuickActionResource extends Resource
                     ->required(fn (Get $get) => in_array($get('action_type'), ['prompt', 'web'])),
 
                 Forms\Components\TextInput::make('target_path')
-                    ->label('网页路径 / 外部网址')
+                    ->label('路径 / 网址')
                     ->maxLength(200)
-                    ->placeholder('/inventory 或 https://example.com')
-                    ->helperText('web-view 加载的地址（自动带 token）')
-                    ->visible(fn (Get $get) => in_array($get('action_type'), ['web', 'open', 'external_open']))
-                    ->required(fn (Get $get) => in_array($get('action_type'), ['web', 'open', 'external_open'])),
+                    ->placeholder('/pages/chat/chat 或 https://example.com')
+                    ->helperText('home: 小程序页路径；open/external_open: web-view 地址（自动带 token）；external: 外部 URL（不带 token）')
+                    ->visible(fn (Get $get) => in_array($get('action_type'), ['web', 'open', 'external_open', 'home', 'route', 'external']))
+                    ->required(fn (Get $get) => in_array($get('action_type'), ['web', 'open', 'external_open', 'route', 'external'])),
 
                 Forms\Components\TextInput::make('target_title')
                     ->label('网页标题')
@@ -130,12 +133,16 @@ class QuickActionResource extends Resource
                         'open'          => '打开网页',
                         'external_open' => '外部网站',
                         'menu'          => '子菜单',
-                        'shortcuts'     => '快捷排',
+                        'shortcuts'     => '快捷行',
+                        'home'          => '返回首页',
+                        'route'         => '原生页',
+                        'external'      => '外链',
                     ][$state] ?? $state)
                     ->color(fn ($state) => match ($state) {
                         'menu', 'shortcuts' => 'warning',
-                        'open', 'external_open' => 'info',
+                        'open', 'external_open', 'external' => 'info',
                         'web' => 'success',
+                        'home' => 'danger',
                         default => 'gray',
                     }),
                 Tables\Columns\IconColumn::make('show_in_chat')->label('聊天快捷')->boolean(),
