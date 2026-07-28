@@ -153,6 +153,8 @@ class QuickAction extends Model
                         $sub['route'] = $item->route;
                     } elseif ($item->item_type === 'external') {
                         $sub['external'] = $item->route;
+                    } elseif ($item->item_type === 'external_open') {
+                        $sub['externalAuth'] = ['url' => $item->route, 'title' => $item->label];
                     } else {
                         $sub['prompt'] = $item->prompt ?? '';
                     }

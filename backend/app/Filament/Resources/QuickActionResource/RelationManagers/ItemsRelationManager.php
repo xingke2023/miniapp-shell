@@ -34,8 +34,10 @@ class ItemsRelationManager extends RelationManager
                 Forms\Components\Select::make('item_type')
                     ->label('点击行为')
                     ->options([
-                        'prompt' => '发送文字给 AI',
-                        'route' => '打开小程序页',
+                        'prompt'        => '发送文字给 AI',
+                        'route'         => '打开小程序页',
+                        'external'      => '打开外部链接（不带 token）',
+                        'external_open' => '打开外部链接（带登录 token）',
                     ])
                     ->default('prompt')
                     ->required()
@@ -47,11 +49,12 @@ class ItemsRelationManager extends RelationManager
                     ->visible(fn (Get $get) => $get('item_type') === 'prompt')
                     ->required(fn (Get $get) => $get('item_type') === 'prompt'),
                 Forms\Components\TextInput::make('route')
-                    ->label('小程序页路径')
-                    ->maxLength(200)
-                    ->placeholder('/pages/report/report')
-                    ->visible(fn (Get $get) => $get('item_type') === 'route')
-                    ->required(fn (Get $get) => $get('item_type') === 'route'),
+                    ->label('路径 / URL')
+                    ->maxLength(500)
+                    ->placeholder('/pages/report/report 或 https://example.com')
+                    ->helperText('route: 小程序页路径；external/external_open: 完整 URL')
+                    ->visible(fn (Get $get) => in_array($get('item_type'), ['route', 'external', 'external_open']))
+                    ->required(fn (Get $get) => in_array($get('item_type'), ['route', 'external', 'external_open'])),
                 Forms\Components\TextInput::make('sort_order')
                     ->label('排序（小在前）')
                     ->numeric()
@@ -66,11 +69,24 @@ class ItemsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('emoji')->label('图标'),
                 Tables\Columns\TextColumn::make('label')->label('标题'),
                 Tables\Columns\TextColumn::make('desc')->label('说明')->placeholder('—'),
+                Tables\Columns\TextColumn::make('route')
+                    ->label('路径 / URL')
+                    ->limit(40)
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('item_type')
                     ->label('行为')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state === 'route' ? '打开页' : '发 AI')
-                    ->color(fn ($state) => $state === 'route' ? 'info' : 'gray'),
+                    ->formatStateUsing(fn ($state) => [
+                        'prompt'        => '发 AI',
+                        'route'         => '小程序页',
+                        'external'      => '外链',
+                        'external_open' => '外链+token',
+                    ][$state] ?? $state)
+                    ->color(fn ($state) => match ($state) {
+                        'route' => 'info',
+                        'external', 'external_open' => 'warning',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('sort_order')->label('排序')->sortable(),
             ])
             ->defaultSort('sort_order')

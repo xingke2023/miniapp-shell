@@ -292,6 +292,7 @@
             data-prompt="{{item.prompt}}"
             data-route="{{item.route}}"
             data-external="{{item.external}}"
+            data-external-auth="{{item.externalAuth}}"
           >
             <image wx:if="{{item.iconSvg}}" class="popover-item-icon-svg" src="{{item.iconSvg}}" mode="aspectFit"/>
             <view wx:else class="popover-item-emoji">{{item.emoji}}</view>

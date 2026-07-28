@@ -914,8 +914,17 @@ Page({
     var route = e.currentTarget.dataset.route || '';
     var prompt = e.currentTarget.dataset.prompt || '';
     var external = e.currentTarget.dataset.external || '';
+    var externalAuth = e.currentTarget.dataset.externalAuth || null;
     this.setData({ reportMenuOpen: false });
-    // 外部 URL（如 app2 后台页）：web-view 打开，无需登录
+    // 带 token 的外部 URL（external_open 类型）
+    if (externalAuth && externalAuth.url) {
+      if (!this._requireLogin()) return;
+      var eu = '/pages/report/report?url=' + encodeURIComponent(externalAuth.url) + '&withToken=1';
+      if (externalAuth.title) { eu += '&title=' + encodeURIComponent(externalAuth.title); }
+      wx.navigateTo({ url: eu, fail: function () { wx.showToast({ title: '打开失败', icon: 'none' }); } });
+      return;
+    }
+    // 外部 URL（不带 token）：web-view 打开，无需登录
     if (external) {
       wx.navigateTo({
         url: '/pages/report/report?url=' + encodeURIComponent(external),
