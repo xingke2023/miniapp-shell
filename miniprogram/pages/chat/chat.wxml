@@ -235,7 +235,6 @@
             data-prompt="{{item.prompt}}"
             data-key="{{item.key}}"
           >
-            <image wx:if="{{item.iconSvg}}" class="qa-chip-icon" src="{{item.iconSvg}}" mode="aspectFit"/>
             <text class="qa-label">{{item.label}}</text>
             <text wx:if="{{item.items && item.items.length}}" class="qa-arrow {{reportMenuKey === item.key ? 'qa-arrow--open' : ''}}">›</text>
             <view wx:if="{{item.badge}}" class="qa-badge">{{item.badge}}</view>
