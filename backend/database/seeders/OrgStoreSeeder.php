@@ -23,7 +23,6 @@ class OrgStoreSeeder extends Seeder
         if (! $regionId) {
             $regionId = DB::table('regions')->insertGetId([
                 'organization_id' => $org->id,
-                'parent_id' => null,
                 'name' => '香港',
                 'code' => 'HK',
                 'created_at' => now(),
