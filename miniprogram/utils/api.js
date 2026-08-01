@@ -13,50 +13,40 @@ var refreshSsoToken = req.refreshSsoToken;
 /**
  * 文字 / 图片 AI 消息 —— POST /ai/message
  * @param {string} text  用户文字（图片识别时可传空字符串）
- * @param {object} opts  { imageBase64?, sessionId?, baseOverride?, tokenOverride?, pathOverride? }
- * @returns {Promise<object>} { reply, intent, card_type?, card_data?, session_id }
+ * @param {object} opts  { imageBase64?, sessionId? }
+ * @returns {Promise<object>} { reply, intent, session_id }
  */
 function aiMessage(text, opts) {
   opts = opts || {};
-  var path = opts.pathOverride || '/ai/message';
-  return request(path, {
+  return request('/ai/message', {
     method: 'POST',
     data: {
       text: text || '',
       image_base64: opts.imageBase64 || undefined,
       session_id: opts.sessionId || undefined,
+      history: opts.history && opts.history.length ? opts.history : undefined,
     },
     timeout: 90000,
-    baseOverride: opts.baseOverride || undefined,
-    tokenOverride: opts.tokenOverride !== undefined ? opts.tokenOverride : undefined,
   });
 }
 
 /**
  * 语音 AI 消息 —— POST /ai/voice（multipart，字段名 audio）
  * @param {string} filePath  录音临时文件路径（mp3）
- * @param {object|number} [opts]  { sessionId?, baseOverride?, tokenOverride? }
+ * @param {object} [opts]  { sessionId? }
  * @returns {Promise<object>} { reply, intent, session_id, ... }
  */
 function aiVoice(filePath, opts) {
-  if (typeof opts === 'number' || typeof opts === 'string') {
-    opts = { sessionId: opts };
-  }
   opts = opts || {};
   return new Promise(function (resolve, reject) {
     var app = getApp();
-    var external = !!opts.baseOverride;
-    var base = opts.baseOverride || app.globalData.apiBaseUrl;
-    var token = external
-      ? (opts.tokenOverride || '')
-      : (app.globalData.token || '');
-    if (!external && !token) { reject(new Error('Unauthenticated')); return; }
+    var token = app.globalData.token || '';
+    if (!token) { reject(new Error('Unauthenticated')); return; }
     var formData = {};
     if (opts.sessionId) { formData.session_id = opts.sessionId; }
-    var header = { Accept: 'application/json' };
-    if (token) { header.Authorization = 'Bearer ' + token; }
+    var header = { Accept: 'application/json', Authorization: 'Bearer ' + token };
     wx.uploadFile({
-      url: base + '/ai/voice',
+      url: app.globalData.apiBaseUrl + '/ai/voice',
       filePath: filePath,
       name: 'audio',
       header: header,
@@ -91,11 +81,6 @@ function quickActions() {
   return request('/quick-actions', { method: 'GET', timeout: 15000 });
 }
 
-// 公开行业列表（无需登录）
-function industries() {
-  return request('/industries', { method: 'GET', timeout: 15000 });
-}
-
 // 公开应用配置（标题等品牌文案，无需登录）
 function appConfig() {
   return request('/app-config', { method: 'GET', timeout: 15000 });
@@ -116,7 +101,6 @@ module.exports = {
   me: me,
   logout: logout,
   quickActions: quickActions,
-  industries: industries,
   appConfig: appConfig,
   aiMessage: aiMessage,
   aiVoice: aiVoice,

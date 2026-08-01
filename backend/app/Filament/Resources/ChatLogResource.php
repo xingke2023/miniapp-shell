@@ -20,13 +20,13 @@ class ChatLogResource extends Resource
 
     protected static ?string $navigationLabel = '对话日志';
 
-    protected static string | \UnitEnum | null $navigationGroup = '系统';
+    protected static string | \UnitEnum | null $navigationGroup = '系统管理';
 
     protected static ?string $modelLabel = '对话日志';
 
     protected static ?string $pluralModelLabel = '对话日志';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 100;
 
     public static function form(Schema $schema): Schema
     {

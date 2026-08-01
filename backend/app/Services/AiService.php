@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AppSetting;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -47,10 +48,12 @@ class AiService
      *
      * @return array{intent: string, items: array, reply: string}
      */
-    public function parseInventoryIntent(string $text, ?string $imageBase64 = null): array
+    public function parseInventoryIntent(string $text, ?string $imageBase64 = null, string $knowledgeContext = ''): array
     {
-        $systemPrompt = <<<'PROMPT'
-你是生鲜门店AI助手（舌尖香港）。识别用户意图，严格只返回以下JSON，不要其他文字：
+        $brandName = AppSetting::get('brand_name', '');
+        $storeType = AppSetting::get('store_type', '门店');
+        $systemPrompt = <<<PROMPT
+你是{$storeType}AI助手（{$brandName}）。识别用户意图，严格只返回以下JSON，不要其他文字：
 
 {
   "intent": "purchase_receipt|sale_report|sold_out|remaining|stocktake|waste_report|inventory_query|sales_today_query|daily_overview_query|purchase_orders_query|daily_logs_query|weather_query|refund_claims_query|suggestions_query|product_query|customer_add|follow_up_add|customer_query|customer_orders_query|other",
@@ -100,6 +103,10 @@ class AiService
 - 若图片模糊/无法识别，intent=other，reply说明无法识别并返回空items
 - reply字段必须先描述识别结果（如"我识别到这是一张进货单，共X种商品：番茄50斤、胡萝卜30斤"），再询问用户（"已为您录入，如有出入请告知"）
 PROMPT;
+
+        if (! empty($knowledgeContext)) {
+            $systemPrompt .= "\n\n【知识库参考资料】\n以下内容可能与问题相关，回答 reply 字段时优先参考，知识库无关内容则按通用知识回答：\n\n{$knowledgeContext}";
+        }
 
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt],

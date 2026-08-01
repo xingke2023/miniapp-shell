@@ -5,9 +5,36 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class QuickAction extends Model
 {
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (QuickAction $model): void {
+            if (empty($model->key)) {
+                $model->key = static::generateUniqueKey($model->label ?? 'action');
+            }
+        });
+    }
+
+    protected static function generateUniqueKey(string $label): string
+    {
+        $base = Str::slug($label);
+        if ($base === '') {
+            $base = 'action';
+        }
+
+        $key = $base;
+        $i = 2;
+        while (static::where('key', $key)->exists()) {
+            $key = $base . '-' . $i++;
+        }
+
+        return $key;
+    }
     protected $fillable = [
         'key',
         'emoji',
@@ -123,6 +150,7 @@ class QuickAction extends Model
                     $sub = [
                         'key' => 'qai-'.$item->id,
                         'emoji' => $item->emoji ?? '',
+                        'icon' => $item->emoji ?? '',
                         'label' => $item->label,
                     ];
                     if ($item->item_type === 'route') {
@@ -142,6 +170,7 @@ class QuickAction extends Model
                     $sub = [
                         'key' => 'qai-'.$item->id,
                         'emoji' => $item->emoji ?? '',
+                        'icon' => $item->emoji ?? '',
                         'label' => $item->label,
                         'desc' => $item->desc ?? '',
                         'showInChat' => (bool) $item->show_in_chat,

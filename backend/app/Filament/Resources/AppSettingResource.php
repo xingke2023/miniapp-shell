@@ -25,7 +25,7 @@ class AppSettingResource extends Resource
 
     protected static ?string $pluralModelLabel = '应用设置';
 
-    protected static ?int $navigationSort = 21;
+    protected static ?int $navigationSort = 20;
 
     public static function form(Schema $schema): Schema
     {

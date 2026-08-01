@@ -7,6 +7,7 @@ use App\Models\AiMessage;
 use App\Models\AiSession;
 use App\Models\WeatherLog;
 use App\Services\AiService;
+use App\Services\KnowledgeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -17,6 +18,7 @@ class AiAssistantController extends Controller
 {
     public function __construct(
         private readonly AiService $aiService,
+        private readonly KnowledgeService $knowledgeService,
     ) {}
 
     /**
@@ -44,7 +46,11 @@ class AiAssistantController extends Controller
 
         $session = $this->getOrCreateSession($request, $inputType);
 
-        $parsed = $this->aiService->parseInventoryIntent($text, $imageBase64);
+        $knowledgeContext = $this->knowledgeService->formatContext(
+            $this->knowledgeService->findRelevant($text)
+        );
+
+        $parsed = $this->aiService->parseInventoryIntent($text, $imageBase64, $knowledgeContext);
 
         $processingMs = (int) ((microtime(true) - $startTime) * 1000);
 
@@ -114,7 +120,12 @@ class AiAssistantController extends Controller
         }
 
         $session = $this->getOrCreateSession($request, 2);
-        $parsed = $this->aiService->parseInventoryIntent($transcribedText);
+
+        $knowledgeContext = $this->knowledgeService->formatContext(
+            $this->knowledgeService->findRelevant($transcribedText)
+        );
+
+        $parsed = $this->aiService->parseInventoryIntent($transcribedText, null, $knowledgeContext);
         $processingMs = (int) ((microtime(true) - $startTime) * 1000);
 
         AiMessage::create([

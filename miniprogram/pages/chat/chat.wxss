@@ -243,36 +243,6 @@
 .ac-btn-ghost   { color: #576B95; }                    /* 微信链接蓝 */
 .ac-btn-danger  { color: #FA5151; }                    /* 警告红 */
 
-/* 「打开完整页」链接按钮：番茄主题，左标题 + 右箭头，紧跟在 AI 回复下方 */
-.weblink-card {
-  display: inline-flex;
-  align-items: center;
-  gap: 12rpx;
-  margin-left: 66rpx;            /* 对齐 AI 气泡（头像 52 + 间距 14） */
-  margin-top: -4rpx;
-  padding: 18rpx 28rpx;
-  background: linear-gradient(135deg, #FF7A5C, #E65C46);
-  border-radius: 999rpx;
-  box-shadow: 0 6rpx 16rpx rgba(230,92,70,0.28);
-}
-.weblink-card--hover {
-  transform: translateY(1rpx);
-  box-shadow: 0 3rpx 10rpx rgba(230,92,70,0.30);
-  opacity: 0.94;
-}
-.weblink-label {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #FFFFFF;
-  line-height: 1.2;
-}
-.weblink-chevron {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: rgba(255,255,255,0.9);
-  line-height: 1;
-  margin-top: -2rpx;
-}
 
 /* 代码块 */
 .md-code {
@@ -718,6 +688,95 @@
 }
 .btn-primary[disabled] { background: rgba(230,92,70,0.30); }
 
+/* Hero 欢迎卡 */
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #E65C46 0%, #b83220 100%);
+  border-radius: 28rpx;
+  margin: 16rpx 0 24rpx;
+  box-shadow: 0 12rpx 36rpx rgba(230, 92, 70, 0.35);
+}
+.hero-deco {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.09);
+}
+.hero-deco-tr {
+  width: 220rpx;
+  height: 220rpx;
+  top: -70rpx;
+  right: -60rpx;
+}
+.hero-deco-bl {
+  width: 280rpx;
+  height: 280rpx;
+  bottom: -110rpx;
+  left: -70rpx;
+  background: rgba(255, 255, 255, 0.06);
+}
+.hero-inner {
+  position: relative;
+  padding: 40rpx 40rpx 36rpx;
+  z-index: 1;
+}
+.hero-top-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 28rpx;
+}
+.hero-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+}
+.hero-avatar-img {
+  width: 60rpx;
+  height: 60rpx;
+}
+.hero-header-text {
+  flex: 1;
+  min-width: 0;
+}
+.hero-brand {
+  color: #fff;
+  font-size: 38rpx;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 1rpx;
+}
+.hero-date {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 26rpx;
+  margin-top: 8rpx;
+  line-height: 1.3;
+}
+.hero-divider {
+  height: 1rpx;
+  background: rgba(255, 255, 255, 0.22);
+  margin: 32rpx 0 28rpx;
+}
+.hero-greeting {
+  color: #fff;
+  font-size: 40rpx;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 10rpx;
+}
+.hero-tagline {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 26rpx;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
 /* 主页快捷按钮行 */
 .shortcuts-row {
   display: flex;
@@ -731,11 +790,10 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 14rpx;
   background: #E8F4FF;
   border-radius: 50rpx;
   padding: 22rpx 32rpx;
-  box-shadow: 0 6rpx 20rpx rgba(56,132,220,0.15);
+  box-shadow: 0 8rpx 24rpx rgba(56,132,220,0.32);
 }
 .shortcut-chip--pressed { opacity: 0.6; }
 .shortcut-icon {

@@ -56,7 +56,7 @@ class IndustryResource extends Resource
                     ->label('品牌标题')
                     ->maxLength(100)
                     ->helperText('进入该行业后，聊天页顶栏显示的标题')
-                    ->placeholder('舌尖生鲜'),
+                    ->placeholder('如：我的品牌'),
 
                 Forms\Components\TextInput::make('description')
                     ->label('行业说明')

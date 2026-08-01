@@ -15,4 +15,10 @@ return [
     'whisper_base_url' => env('AI_WHISPER_BASE_URL', env('AI_BASE_URL')),
     'whisper_api_key' => env('AI_WHISPER_API_KEY', env('AI_API_KEY')),
     'whisper_model' => env('AI_WHISPER_MODEL', 'whisper-1'),
+
+    // 向量嵌入 — DeepSeek（默认与文字处理同 base_url/api_key）
+    'embedding_base_url'   => env('AI_EMBEDDING_BASE_URL',   env('AI_BASE_URL')),
+    'embedding_api_key'    => env('AI_EMBEDDING_API_KEY',    env('AI_API_KEY')),
+    'embedding_model'      => env('AI_EMBEDDING_MODEL',      'deepseek-embedding'),
+    'embedding_dimensions' => (int) env('AI_EMBEDDING_DIMENSIONS', 1536),
 ];

@@ -36,8 +36,28 @@
     show-scrollbar="{{false}}"
   >
     <block wx:for="{{msgs}}" wx:key="id">
+      <!-- Hero 欢迎卡 -->
+      <view wx:if="{{item.from === 'hero'}}" class="hero-card">
+        <view class="hero-deco hero-deco-tr"></view>
+        <view class="hero-deco hero-deco-bl"></view>
+        <view class="hero-inner">
+          <view class="hero-top-row">
+            <view class="hero-avatar">
+              <image class="hero-avatar-img" src="{{item.botIconSvg}}" mode="aspectFit"/>
+            </view>
+            <view class="hero-header-text">
+              <view class="hero-brand">{{item.brand}}</view>
+              <view class="hero-date">{{item.dateStr}} · {{item.weekStr}}</view>
+            </view>
+          </view>
+          <view class="hero-divider"></view>
+          <view class="hero-greeting">{{item.greeting}}</view>
+          <view class="hero-tagline">{{item.tagline}}</view>
+        </view>
+      </view>
+
       <!-- 快捷按钮行（主页展开，左右均匀分布） -->
-      <view wx:if="{{item.from === 'shortcuts'}}" class="shortcuts-row">
+      <view wx:elif="{{item.from === 'shortcuts'}}" class="shortcuts-row">
         <view
           wx:for="{{item.shortcuts}}"
           wx:for-item="sc"
@@ -45,33 +65,17 @@
           class="shortcut-chip"
           hover-class="shortcut-chip--pressed"
           hover-stay-time="100"
-          bindtap="onQuickAction"
-          data-key="{{sc.key}}"
-          data-prompt="{{sc.prompt}}"
+          bindtap="onShortcutTap"
+          data-item="{{sc}}"
         >
-          <image wx:if="{{sc.iconSvg}}" class="shortcut-icon" src="{{sc.iconSvg}}" mode="aspectFit"/>
-          <text wx:else class="shortcut-icon-fallback">{{sc.emoji}}</text>
           <text class="shortcut-label">{{sc.label}}</text>
         </view>
       </view>
 
       <view wx:elif="{{true}}" class="row row-{{item.from}}">
-        <!-- 打开网页链接按钮（如「打开完整库存页」） -->
-        <view
-          wx:if="{{item.weblink}}"
-          class="weblink-card"
-          hover-class="weblink-card--hover"
-          hover-stay-time="80"
-          bindtap="onWebLink"
-          data-url="{{item.weblink.url}}"
-        >
-          <text class="weblink-label">{{item.weblink.label}}</text>
-          <text class="weblink-chevron">›</text>
-        </view>
-
         <!-- AI text bubble (markdown 块级渲染，列表用 flex 对齐) -->
         <view
-          wx:elif="{{item.from === 'ai'}}"
+          wx:if="{{item.from === 'ai'}}"
           class="bubble bubble-ai font-{{fontSize}}"
         >
           <block wx:for="{{item.blocks}}" wx:for-item="blk" wx:key="k">
@@ -181,7 +185,7 @@
 
   <!-- Bottom input -->
   <view class="bottom">
-    <view wx:if="{{!externalMode && !user && !logging}}" class="login-prompt">
+    <view wx:if="{{!user && !logging}}" class="login-prompt">
       <view class="login-tip">{{isRegisterMode ? '注册一个新账号' : '请用账号登录后开始聊天'}}</view>
       <view class="login-card">
         <view class="login-row">
@@ -216,7 +220,7 @@
       <text class="auth-mode-toggle" bindtap="onToggleRegisterMode">{{isRegisterMode ? '已有账号？去登录' : '没有账号？去注册'}}</text>
     </view>
 
-    <view wx:elif="{{!externalMode && logging}}" class="login-prompt">
+    <view wx:elif="{{logging}}" class="login-prompt">
       <view class="login-tip">正在为你登录…</view>
     </view>
 
@@ -258,7 +262,7 @@
 
         <input wx:else
           class="input"
-          placeholder="{{aiBusy ? 'AI 思考中…' : (externalMode ? '查库存、客户、订单…' : '随便聊聊，或问点什么…')}}"
+          placeholder="{{aiBusy ? 'AI 思考中…' : '随便聊聊，或问点什么…'}}"
           value="{{chatInput}}"
           bindinput="onInput"
           confirm-type="send"
@@ -294,7 +298,7 @@
             data-external-auth="{{item.externalAuth}}"
           >
             <image wx:if="{{item.iconSvg}}" class="popover-item-icon-svg" src="{{item.iconSvg}}" mode="aspectFit"/>
-            <view wx:else class="popover-item-emoji">{{item.emoji}}</view>
+            <view wx:elif="{{item.emojiDisplay}}" class="popover-item-emoji">{{item.emojiDisplay}}</view>
             <view class="popover-item-texts">
               <view class="popover-item-label">{{item.label}}</view>
               <view wx:if="{{item.desc}}" class="popover-item-desc">{{item.desc}}</view>

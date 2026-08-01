@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\QuickActionResource\RelationManagers;
 
+use App\Filament\Forms\Components\IconPickerField;
 use Filament\Forms;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -9,6 +10,8 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Actions;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class ItemsRelationManager extends RelationManager
 {
@@ -20,10 +23,8 @@ class ItemsRelationManager extends RelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\TextInput::make('emoji')
-                    ->label('图标 Emoji')
-                    ->maxLength(16)
-                    ->placeholder('📊'),
+                IconPickerField::make('emoji')
+                    ->label('图标（SVG 轮廓）'),
                 Forms\Components\TextInput::make('label')
                     ->label('标题')
                     ->required()
@@ -42,6 +43,53 @@ class ItemsRelationManager extends RelationManager
                     ->default('prompt')
                     ->required()
                     ->live(),
+
+                Forms\Components\Select::make('_preset_service')
+                    ->label('从预制服务选择')
+                    ->placeholder('选择后自动填入标题、链接、说明...')
+                    ->options(function (): array {
+                        try {
+                            $services = Cache::remember('ai_public_services', 300, function () {
+                                return Http::timeout(5)
+                                    ->get('https://ai.xingke888.com/api/public/services')
+                                    ->json('data', []);
+                            });
+
+                            return collect($services)
+                                ->groupBy('category')
+                                ->map(fn ($items) => $items->mapWithKeys(
+                                    fn ($s) => [$s['slug'] => $s['name']]
+                                ))
+                                ->toArray();
+                        } catch (\Exception $e) {
+                            return [];
+                        }
+                    })
+                    ->searchable()
+                    ->live()
+                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                        if (! $state) {
+                            return;
+                        }
+                        try {
+                            $services = Cache::remember('ai_public_services', 300, function () {
+                                return Http::timeout(5)
+                                    ->get('https://ai.xingke888.com/api/public/services')
+                                    ->json('data', []);
+                            });
+                            $service = collect($services)->firstWhere('slug', $state);
+                            if ($service) {
+                                $set('route', $service['url']);
+                                $set('label', $service['shortName'] ?? $service['name']);
+                                $set('desc', $service['description'] ?? '');
+                            }
+                        } catch (\Exception $e) {
+                        }
+                    })
+                    ->visible(fn (Get $get) => in_array($get('item_type'), ['external', 'external_open']))
+                    ->columnSpanFull()
+                    ->dehydrated(false),
+
                 Forms\Components\Textarea::make('prompt')
                     ->label('发给 AI 的文字')
                     ->rows(2)
@@ -70,7 +118,19 @@ class ItemsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('emoji')->label('图标'),
+                Tables\Columns\TextColumn::make('emoji')
+                    ->label('图标')
+                    ->html()
+                    ->formatStateUsing(function (?string $state): string {
+                        if (!$state) {
+                            return '<span class="text-gray-400">—</span>';
+                        }
+                        if (preg_match('/^[a-z0-9-]+$/', $state)) {
+                            return svg('heroicon-o-' . $state, ['class' => 'w-5 h-5 inline-block text-gray-600 dark:text-gray-300'])->toHtml();
+                        }
+
+                        return e($state);
+                    }),
                 Tables\Columns\TextColumn::make('label')->label('标题'),
                 Tables\Columns\TextColumn::make('desc')->label('说明')->placeholder('—'),
                 Tables\Columns\TextColumn::make('route')

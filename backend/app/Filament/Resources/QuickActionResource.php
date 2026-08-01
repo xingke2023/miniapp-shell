@@ -21,23 +21,18 @@ class QuickActionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = '系统';
 
-    protected static ?string $navigationLabel = '小程序快捷菜单';
+    protected static ?string $navigationLabel = '小程序菜单';
 
     protected static ?string $modelLabel = '快捷菜单';
 
-    protected static ?string $pluralModelLabel = '小程序快捷菜单';
+    protected static ?string $pluralModelLabel = '小程序菜单';
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 21;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
-                Forms\Components\TextInput::make('emoji')
-                    ->label('图标 Emoji')
-                    ->maxLength(16)
-                    ->placeholder('📦'),
-
                 Forms\Components\TextInput::make('label')
                     ->label('按钮文字')
                     ->required()
@@ -104,11 +99,6 @@ class QuickActionResource extends Resource
                 Forms\Components\Toggle::make('admin_only')
                     ->label('仅管理员可见'),
 
-                Forms\Components\TextInput::make('key')
-                    ->label('标识 key')
-                    ->required()
-                    ->maxLength(50)
-                    ->helperText('英文唯一标识'),
             ]);
     }
 
@@ -117,7 +107,6 @@ class QuickActionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('sort_order')->label('序')->sortable(),
-                Tables\Columns\TextColumn::make('emoji')->label('图标'),
                 Tables\Columns\TextColumn::make('label')->label('按钮文字')->searchable(),
                 Tables\Columns\TextColumn::make('action_type')
                     ->label('类型')

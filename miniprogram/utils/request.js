@@ -5,10 +5,7 @@
 function callBackend(path, options) {
   return new Promise(function (resolve, reject) {
     var app = getApp();
-    // baseOverride：某些行业（如进销存及CRM）的接口指向外部后端（app2），优先于默认 base
-    var base = options.baseOverride || app.globalData.apiBaseUrl;
-    // tokenOverride：外部行业用独立的 app2 JWT，不能用 paper token（账号体系不同）
-    var token = options.tokenOverride !== undefined ? options.tokenOverride : (app.globalData.token || '');
+    var token = app.globalData.token || '';
     var headers = Object.assign(
       { 'Content-Type': 'application/json', Accept: 'application/json' },
       token ? { Authorization: 'Bearer ' + token } : {},
@@ -16,7 +13,7 @@ function callBackend(path, options) {
     );
 
     wx.request({
-      url: base + path,
+      url: app.globalData.apiBaseUrl + path,
       method: options.method || 'GET',
       data: options.data || {},
       header: headers,
@@ -123,7 +120,7 @@ function ssoRegister(username, password, name, email) {
 }
 
 /**
- * 账号密码登录 —— 舌尖后端 POST /login（保留，供非 SSO 场景复用）
+ * 账号密码登录 —— POST /login（保留，供非 SSO 场景复用）
  * body: { login: 用户名或邮箱, password }
  * 成功返回 { token, jwt_token, store_id, user }
  */
@@ -169,10 +166,6 @@ function request(path, options) {
   options = options || {};
   return callBackend(path, options).then(function (res) {
     if (res.statusCode === 401) {
-      // baseOverride = 外部行业请求，token 由后台管理，客户端不清除；paper 请求才清本地登录态
-      if (options.baseOverride) {
-        throw new Error('App2Unauthenticated');
-      }
       clearAuth();
       throw new Error('Unauthenticated');
     }
