@@ -402,6 +402,8 @@ Page({
     statusBarHeight: 0,
     appTitle: '', // 顶部标题，后台 app_config miniprogram_title 覆盖
     brandName: '', // 品牌名，后台 app_config brand_name 覆盖
+    headerBg: '',  // header 背景渐变，后台 app_config hero_gradient 覆盖
+    heroTagline: '', // 登录后在 header 显示的时段问候文案
     user: null,
     logging: false,
     loginForm: { username: '', password: '' },
@@ -448,32 +450,37 @@ Page({
     });
 
     this._sessionId = null;
+    this._validateToken = 0;
+    this._greetGen = 0;
 
     this.setData({ mediaEnabled: true });
-
-    // 应用配置（标题等）——公开接口，登录前也拉取
-    this._loadAppConfig();
 
     // 开启右上角「…」菜单里的转发给朋友 / 分享到朋友圈
     if (wx.showShareMenu) {
       wx.showShareMenu({ withShareTicket: false, menus: ['shareAppMessage', 'shareTimeline'] });
     }
 
-    // 只有 token + user 都在才算登录；并后台校验 token 是否仍有效
-    if (app.globalData.token && app.globalData.user) {
-      this.setData({ user: app.globalData.user });
-      this._greetLoggedIn(app.globalData.user);
-      this._validateSession();
-      this._loadQuickActions();
-    } else {
+    // 先拉配置（标题/品牌名），拉完再渲染 hero，保证 appTitle 已就绪
+    // !self.data.user 防止登录比配置先完成时重复渲染
+    var self = this;
+    this._loadAppConfig(function () {
+      if (!self.data.user && app.globalData.token && app.globalData.user) {
+        self.setData({ user: app.globalData.user });
+        self._greetLoggedIn(app.globalData.user);
+        self._validateSession();
+        self._loadQuickActions();
+      }
       // 无缓存登录态：直接展示登录表单，由用户输入自己的账号密码走 SSO 登录
-    }
+    });
   },
 
-  // 校验缓存的 token 是否仍有效，失效则清空登录态、展示登录表单
+  // 校验缓存的 token 是否仍有效，失效则清空登录态、展示登录表单。
+  // _validateToken 是递增计数器：_doLogin 成功后自增，使进行中的旧校验失效。
   _validateSession: function () {
     var self = this;
+    var token = ++self._validateToken;
     api.me().catch(function (err) {
+      if (token !== self._validateToken) { return; }
       var msg = (err && err.message) || '';
       if (msg === 'Unauthenticated') {
         self.setData({ user: null, msgs: [] });
@@ -482,8 +489,8 @@ Page({
     });
   },
 
-  // 拉取应用配置（标题等）；失败则保留 data 里的默认标题。
-  _loadAppConfig: function () {
+  // 拉取应用配置（标题等）；失败则保留 data 里的默认标题。支持可选回调 cb()。
+  _loadAppConfig: function (cb) {
     var self = this;
     api.appConfig().then(function (res) {
       var cfg = (res && res.data) || {};
@@ -493,7 +500,13 @@ Page({
       if (cfg.brand_name) {
         self.setData({ brandName: cfg.brand_name });
       }
-    }).catch(function () { /* 保留默认标题 */ });
+      if (cfg.hero_gradient) {
+        self.setData({ headerBg: cfg.hero_gradient });
+      }
+      if (cb) { cb(); }
+    }).catch(function () {
+      if (cb) { cb(); }
+    });
   },
 
   // 从后台拉取底部快捷按钮配置；失败/空则保留 data 里写死的默认数组（避免空白）
@@ -534,7 +547,7 @@ Page({
   onShareAppMessage: function () {
     var brand = this.data.brandName || this.data.appTitle || 'AI店长助手';
     return {
-      title: brand + ' · AI 店长助手',
+      title: brand,
       path: '/pages/chat/chat',
     };
   },
@@ -543,7 +556,7 @@ Page({
   onShareTimeline: function () {
     var brand = this.data.brandName || this.data.appTitle || 'AI店长助手';
     return {
-      title: brand + ' · AI 店长助手',
+      title: brand,
     };
   },
 
@@ -567,11 +580,14 @@ Page({
 
   _greetLoggedIn: function (user) {
     var self = this;
+    var gen = ++self._greetGen;
     var greeting = '我是 AI 助手\n\n点下面菜单或直接在输入框跟我说，我来帮你处理。';
     self._pushHero(user);
     setTimeout(function () {
+      if (gen !== self._greetGen) { return; }
       self._pushAi(greeting, 1000);
       setTimeout(function () {
+        if (gen !== self._greetGen) { return; }
         if (self._initShortcuts) {
           self._pushShortcuts(self._initShortcuts);
         } else {
@@ -585,15 +601,6 @@ Page({
     var now = new Date();
     var hour = now.getHours();
     var weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-    var taglines = [
-      '周末了，今天轻松收个好尾 🌟',
-      '新周开始，满满当当冲一波 💪',
-      '周二加油，节节走高 🔥',
-      '周三到了，今天过了就是下坡路 ⛰️',
-      '快周末啦，再坚持一下 🙌',
-      '周五！今天冲刺一波 🚀',
-      '周六，客流最旺的日子 🚀',
-    ];
     var timeGreeting;
     if (hour >= 5 && hour < 12) {
       timeGreeting = '早上好';
@@ -607,14 +614,34 @@ Page({
       timeGreeting = '夜深了';
     }
     var name = (user && user.name) || '老板';
+
+    var scheme = { bg: '#0D47A1', shadow: 'rgba(15,60,150,0.48)' };
+
+    var tagline = (function (h, d) {
+      var byTime = [
+        [5,  12, ['早安！AI控制台已就绪，今天也要加油哦 ☀️', '清晨好，今天的数据从这里开始 📊', '早上好，让AI帮你轻松开工 🌅']],
+        [12, 14, ['中午了，趁午休来看看今日数据吧 🍱', '午间好，AI控制台时刻待命 ✅']],
+        [14, 18, ['下午好，随时告诉我你的需求 💬', '下午了，有什么我能帮上的？ 🤝', '下午好，让我帮你处理今天的事务 📋']],
+        [18, 23, ['晚上好，今天辛苦了，来看看收成吧 🌙', '收工前来汇报一下？AI控制台在线 🌃', '晚间好，今日数据已为你整理好 📈']],
+      ];
+      var general = ['欢迎使用AI控制台 👋', '有什么需要，直接告诉我 💡', '今天也来聊聊门店情况吧 🏪', '数据随时查，指令随时下 ⚡'];
+      for (var i = 0; i < byTime.length; i++) {
+        if (h >= byTime[i][0] && h < byTime[i][1]) {
+          var pool = byTime[i][2];
+          return pool[d % pool.length];
+        }
+      }
+      return general[d % general.length];
+    }(hour, now.getDate()));
+
     var msgs = this.data.msgs.concat([{
       id: nextId(),
       from: 'hero',
       greeting: timeGreeting + '，' + name,
-      brand: this.data.appTitle || 'AI 店长助手',
-      dateStr: now.getFullYear() + ' 年 ' + (now.getMonth() + 1) + ' 月 ' + now.getDate() + ' 日',
-      weekStr: '星期' + weekdays[now.getDay()],
-      tagline: taglines[now.getDay()],
+      tagline: tagline,
+      dateStr: (now.getMonth() + 1) + '月' + now.getDate() + '日 · 星期' + weekdays[now.getDay()],
+      cardBg: scheme.bg,
+      cardShadow: '0 20rpx 56rpx ' + scheme.shadow + ', 0 4rpx 12rpx rgba(0,0,0,0.12)',
       botIconSvg: ICONS.botWhite,
     }]);
     this.setData({ msgs: msgs });
@@ -1067,11 +1094,14 @@ Page({
 
     api.ssoRegister(username, password).then(function () {
       var app = getApp();
+      self._validateToken++;
+      self._greetGen++;
       self.setData({
         user: app.globalData.user,
         logging: false,
         isRegisterMode: false,
         loginForm: { username: '', password: '' },
+        msgs: [],
       });
       wx.nextTick(function () { self._recomputeMsgsHeight(); });
       self._greetLoggedIn(app.globalData.user);
@@ -1091,12 +1121,17 @@ Page({
 
     api.ssoLogin(identifier, password).then(function () {
       var app = getApp();
+      self._validateToken++;
+      self._greetGen++;
       self.setData({
         user: app.globalData.user,
         logging: false,
         loginForm: { username: '', password: '' },
+        msgs: [],
       });
       wx.nextTick(function () { self._recomputeMsgsHeight(); });
+      // 登录后重新拉配置，确保显示用户所属模板的品牌名/标题
+      self._loadAppConfig();
       self._greetLoggedIn(app.globalData.user);
       self._loadQuickActions();
     }).catch(function (err) {
