@@ -19,7 +19,7 @@ class ChatShortcutResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
-    protected static string|\UnitEnum|null $navigationGroup = '系统';
+    protected static string|\UnitEnum|null $navigationGroup = '前端系统';
 
     protected static ?string $navigationLabel = '小程序聊天区胶囊按钮';
 

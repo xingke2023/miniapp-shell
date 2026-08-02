@@ -24,6 +24,8 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'is_admin',
+        'menu_template_id',
+        'ai_enabled',
     ];
 
     protected $hidden = [
@@ -37,6 +39,7 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+        'ai_enabled' => 'boolean',
         ];
     }
 
@@ -48,6 +51,11 @@ class User extends Authenticatable implements FilamentUser
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function menuTemplate(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(MenuTemplate::class);
     }
 
     public function storeRoles(): HasMany

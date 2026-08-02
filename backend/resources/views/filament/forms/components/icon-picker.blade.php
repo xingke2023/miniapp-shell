@@ -32,13 +32,12 @@
         <div class="flex items-center gap-1.5">
             <div class="flex items-center gap-1.5 flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-2 py-1.5 min-h-[2rem]">
                 <template x-if="selected && getIconEntry(selected)">
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5 min-w-0">
                         <span
                             class="w-4 h-4 text-primary-600 dark:text-primary-400 shrink-0"
                             x-html="getIconEntry(selected).svg"
                         ></span>
-                        <span class="text-xs text-gray-700 dark:text-gray-200" x-text="getIconEntry(selected).label"></span>
-                        <span class="text-xs text-gray-400 font-mono" x-text="selected"></span>
+                        <span class="text-xs text-gray-700 dark:text-gray-200 truncate" x-text="getIconEntry(selected).label"></span>
                     </div>
                 </template>
                 <template x-if="!selected || !getIconEntry(selected)">
@@ -88,7 +87,7 @@
             />
 
             {{-- Icon grid --}}
-            <div class="grid grid-cols-12 gap-0.5 max-h-48 overflow-y-auto">
+            <div class="grid gap-0.5 max-h-48 overflow-y-auto" style="grid-template-columns: repeat(auto-fill, minmax(28px, 1fr))">
                 <template x-for="icon in filtered" :key="icon.name">
                     <button
                         type="button"

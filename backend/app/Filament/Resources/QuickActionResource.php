@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Forms\Components\IconPickerField;
 use App\Filament\Resources\QuickActionResource\Pages;
 use App\Filament\Resources\QuickActionResource\RelationManagers\ItemsRelationManager;
 use App\Models\QuickAction;
@@ -19,7 +20,7 @@ class QuickActionResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static string|\UnitEnum|null $navigationGroup = '系统';
+    protected static string|\UnitEnum|null $navigationGroup = '前端系统';
 
     protected static ?string $navigationLabel = '小程序菜单';
 
@@ -28,6 +29,8 @@ class QuickActionResource extends Resource
     protected static ?string $pluralModelLabel = '小程序菜单';
 
     protected static ?int $navigationSort = 21;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
@@ -42,19 +45,17 @@ class QuickActionResource extends Resource
                     ->label('按钮类型')
                     ->options([
                         'prompt'        => '发文字给 AI',
-                        'web'           => 'AI 摘要 + 打开网页',
+                        'web'           => 'AI 摘要+网页',
                         'open'          => '打开网页（带 token）',
-                        'external_open' => '打开外部网站（带 token）',
+                        'external_open' => '外部网站（带 token）',
                         'menu'          => '弹出子菜单',
                         'shortcuts'     => '展开快捷按钮到聊天区',
-                        'home'          => '返回首页（reLaunch）',
-                        'route'         => '跳转小程序原生页',
-                        'external'      => '打开外部网站（不带 token）',
+                        'route'         => '小程序原生页',
+                        'external'      => '外部网站（不带 token）',
                     ])
                     ->default('prompt')
                     ->required()
-                    ->live()
-                    ->helperText('选 menu 或 shortcuts 后，在下方「子菜单项」维护'),
+                    ->live(),
 
                 Forms\Components\Textarea::make('prompt')
                     ->label('发给 AI 的文字')
@@ -99,6 +100,11 @@ class QuickActionResource extends Resource
                 Forms\Components\Toggle::make('admin_only')
                     ->label('仅管理员可见'),
 
+                Forms\Components\Toggle::make('show_in_chat')
+                    ->label('聊天区显示')
+                    ->helperText('menu 类型：勾选后子菜单项可显示为聊天区胶囊按钮')
+                    ->visible(fn (Get $get) => $get('action_type') === 'menu'),
+
             ]);
     }
 
@@ -132,6 +138,7 @@ class QuickActionResource extends Resource
                 Tables\Columns\IconColumn::make('admin_only')->label('仅管理员')->boolean(),
                 Tables\Columns\IconColumn::make('enabled')->label('启用')->boolean(),
             ])
+            ->modifyQueryUsing(fn ($query) => $query->where('key', '!=', 'home'))
             ->filters([
                 Tables\Filters\TernaryFilter::make('enabled')->label('启用'),
                 Tables\Filters\TernaryFilter::make('admin_only')->label('仅管理员'),

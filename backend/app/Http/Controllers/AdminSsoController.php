@@ -20,13 +20,18 @@ class AdminSsoController extends Controller
         $claims = $token !== '' ? $jwt->decode($token) : null;
         $user = $claims ? User::find($claims->sub) : null;
 
-        if (! $user || ! $user->is_admin) {
+        if (! $user) {
             return redirect('/admin/login');
         }
 
-        Auth::guard('web')->login($user, true);
-        $request->session()->regenerate();
+        if ($user->is_admin) {
+            Auth::guard('web')->login($user, true);
+            $request->session()->regenerate();
 
-        return redirect('/admin');
+            return redirect('/admin');
+        }
+
+        // 非管理员用户：带 JWT 跳转前端，由 AuthProvider 完成自动登录
+        return redirect('/?token=' . urlencode($token));
     }
 }

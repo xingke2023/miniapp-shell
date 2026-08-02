@@ -1,12 +1,12 @@
 <view class="root">
   <!-- Header -->
-  <view class="header" style="padding-top: {{statusBarHeight}}px;">
+  <view class="header" style="padding-top: {{statusBarHeight}}px;{{headerBg ? 'background:' + headerBg + ';' : ''}}">
     <view class="header-inner">
       <view class="title-block">
         <view class="title">{{appTitle}}</view>
         <view class="subtitle">
           <text class="dot"></text>
-          <text wx:if="{{user}}">{{user.name}}</text>
+          <text wx:if="{{user}}" class="header-username">{{user.name}}</text>
           <text wx:if="{{user}}" class="logout-link" catchtap="onLogout">退出</text>
           <text wx:else>{{logging ? '正在登录…' : '未登录'}}</text>
         </view>
@@ -37,22 +37,17 @@
   >
     <block wx:for="{{msgs}}" wx:key="id">
       <!-- Hero 欢迎卡 -->
-      <view wx:if="{{item.from === 'hero'}}" class="hero-card">
-        <view class="hero-deco hero-deco-tr"></view>
-        <view class="hero-deco hero-deco-bl"></view>
+      <view wx:if="{{item.from === 'hero'}}" class="hero-card" style="background:{{item.cardBg}};box-shadow:{{item.cardShadow}};">
+
         <view class="hero-inner">
           <view class="hero-top-row">
             <view class="hero-avatar">
               <image class="hero-avatar-img" src="{{item.botIconSvg}}" mode="aspectFit"/>
             </view>
-            <view class="hero-header-text">
-              <view class="hero-brand">{{item.brand}}</view>
-              <view class="hero-date">{{item.dateStr}} · {{item.weekStr}}</view>
-            </view>
+            <view class="hero-greeting">{{item.greeting}}</view>
           </view>
-          <view class="hero-divider"></view>
-          <view class="hero-greeting">{{item.greeting}}</view>
           <view class="hero-tagline">{{item.tagline}}</view>
+          <view class="hero-date">{{item.dateStr}}</view>
         </view>
       </view>
 
@@ -185,43 +180,71 @@
 
   <!-- Bottom input -->
   <view class="bottom">
-    <view wx:if="{{!user && !logging}}" class="login-prompt">
-      <view class="login-tip">{{isRegisterMode ? '注册一个新账号' : '请用账号登录后开始聊天'}}</view>
-      <view class="login-card">
-        <view class="login-row">
-          <text class="login-row-label">账号</text>
-          <input
-            class="login-field"
-            placeholder="{{isRegisterMode ? '设置用户名（字母/数字/下划线）' : '用户名 / 邮箱'}}"
-            placeholder-class="login-ph"
-            value="{{loginForm.username}}"
-            data-field="username"
-            bindinput="onLoginInput"
-            confirm-type="next"
-          />
+    <!-- 全屏登录页 -->
+    <view wx:if="{{!user && !logging}}" class="login-screen">
+      <view class="ls-glow ls-glow-a"></view>
+      <view class="ls-glow ls-glow-b"></view>
+      <view class="ls-inner">
+        <view class="ls-brand">
+          <view class="ls-logo">
+            <image class="ls-logo-img" src="{{icons.botWhite}}" mode="aspectFit"/>
+          </view>
+          <text class="ls-brand-name">{{appTitle}}</text>
+          <text class="ls-brand-sub" wx:if="{{brandName}}">{{brandName}}</text>
         </view>
-        <view class="login-divider"></view>
-        <view class="login-row">
-          <text class="login-row-label">密码</text>
-          <input
-            class="login-field"
-            placeholder="{{isRegisterMode ? '设置密码（至少8位）' : '登录密码'}}"
-            placeholder-class="login-ph"
-            password="{{true}}"
-            value="{{loginForm.password}}"
-            data-field="password"
-            bindinput="onLoginInput"
-            confirm-type="done"
-            bindconfirm="onLogin"
-          />
+        <view class="ls-card">
+          <text class="ls-card-title">{{isRegisterMode ? '创建账号' : '欢迎回来'}}</text>
+          <text class="ls-card-desc">{{isRegisterMode ? '填写信息，开始使用' : '用账号密码登录继续'}}</text>
+          <view class="ls-field-group">
+            <view class="ls-field-row">
+              <image class="ls-field-icon" src="{{icons.user}}" mode="aspectFit"/>
+              <input
+                class="ls-field-input"
+                placeholder="{{isRegisterMode ? '设置用户名（字母/数字/下划线）' : '用户名 / 邮箱'}}"
+                placeholder-class="ls-ph"
+                value="{{loginForm.username}}"
+                data-field="username"
+                bindinput="onLoginInput"
+                confirm-type="next"
+              />
+            </view>
+            <view class="ls-field-divider"></view>
+            <view class="ls-field-row">
+              <image class="ls-field-icon" src="{{icons.key}}" mode="aspectFit"/>
+              <input
+                class="ls-field-input"
+                placeholder="{{isRegisterMode ? '设置密码（至少8位）' : '登录密码'}}"
+                placeholder-class="ls-ph"
+                password="{{true}}"
+                value="{{loginForm.password}}"
+                data-field="password"
+                bindinput="onLoginInput"
+                confirm-type="done"
+                bindconfirm="onLogin"
+              />
+            </view>
+          </view>
+          <button class="ls-btn" bindtap="onLogin" disabled="{{logging}}">
+            {{isRegisterMode ? '注册账号' : '立即登录'}}
+          </button>
+          <text class="ls-toggle" bindtap="onToggleRegisterMode">
+            {{isRegisterMode ? '已有账号？去登录 →' : '没有账号？去注册 →'}}
+          </text>
         </view>
+        <text class="ls-footer">数据安全 · 加密保护</text>
       </view>
-      <button class="btn-primary login-submit" bindtap="onLogin" disabled="{{logging}}">{{isRegisterMode ? '注册' : '登录'}}</button>
-      <text class="auth-mode-toggle" bindtap="onToggleRegisterMode">{{isRegisterMode ? '已有账号？去登录' : '没有账号？去注册'}}</text>
     </view>
 
-    <view wx:elif="{{logging}}" class="login-prompt">
-      <view class="login-tip">正在为你登录…</view>
+    <!-- 登录中状态 -->
+    <view wx:elif="{{logging}}" class="login-screen">
+      <view class="ls-glow ls-glow-a"></view>
+      <view class="ls-glow ls-glow-b"></view>
+      <view class="ls-inner ls-inner-center">
+        <view class="ls-logo ls-logo-pulse">
+          <image class="ls-logo-img" src="{{icons.botWhite}}" mode="aspectFit"/>
+        </view>
+        <text class="ls-loading-txt">正在登录…</text>
+      </view>
     </view>
 
     <view wx:else class="input-area">

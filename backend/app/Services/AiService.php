@@ -48,10 +48,13 @@ class AiService
      *
      * @return array{intent: string, items: array, reply: string}
      */
-    public function parseInventoryIntent(string $text, ?string $imageBase64 = null, string $knowledgeContext = ''): array
+    /**
+     * @param  array<string,mixed>  $settingsOverride  模板专属设置（覆盖全局 AppSetting）
+     */
+    public function parseInventoryIntent(string $text, ?string $imageBase64 = null, string $knowledgeContext = '', array $settingsOverride = []): array
     {
-        $brandName = AppSetting::get('brand_name', '');
-        $storeType = AppSetting::get('store_type', '门店');
+        $brandName = (string) ($settingsOverride['brand_name'] ?? AppSetting::get('brand_name', ''));
+        $storeType = (string) ($settingsOverride['store_type'] ?? AppSetting::get('store_type', '门店'));
         $systemPrompt = <<<PROMPT
 你是{$storeType}AI助手（{$brandName}）。识别用户意图，严格只返回以下JSON，不要其他文字：
 

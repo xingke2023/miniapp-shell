@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\MenuTemplate;
 use App\Models\QuickAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,9 +19,15 @@ class QuickActionController extends Controller
         $storeId = $user?->resolveStoreId();
         $isAdmin = (bool) ($user?->is_admin);
 
+        // 优先用用户指定的模版，否则取行业当前生效模版
+        $templateId = $user?->menu_template_id
+            ?? MenuTemplate::query()->where('is_active', true)->value('id');
+
         $actions = QuickAction::query()
             ->with('items')
             ->where('enabled', true)
+            ->where('key', '!=', 'home')
+            ->when($templateId, fn ($q) => $q->where('menu_template_id', $templateId))
             // 全门店通用（store_id 为 null）或匹配当前门店
             ->where(function ($q) use ($storeId) {
                 $q->whereNull('store_id');
@@ -34,7 +41,9 @@ class QuickActionController extends Controller
             ->orderBy('id')
             ->get();
 
-        $data = $actions->map(fn (QuickAction $a) => $a->toClientArray())->all();
+        // 首页按钮固定在第一位，不由数据库控制
+        $homeNode = ['key' => 'home', 'emoji' => '🏠', 'label' => '首页', 'badge' => ''];
+        $data = array_merge([$homeNode], $actions->map(fn (QuickAction $a) => $a->toClientArray())->all());
 
         // 聊天区蓝色胶囊：收集所有 menu 类型按钮下 show_in_chat=true 的子项
         $shortcuts = [];

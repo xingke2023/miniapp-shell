@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\MenuTemplate;
 use App\Models\Role;
 use App\Models\Store;
 use App\Models\User;
@@ -68,6 +69,27 @@ class UserResource extends Resource
                             ->label('后台管理员')
                             ->helperText('开启后可登录 /admin 后台，拥有最高权限')
                             ->inline(false),
+
+                        Forms\Components\Toggle::make('ai_enabled')
+                            ->label('AI 功能')
+                            ->helperText('关闭后用户发送任何消息均回复「此项功能尚未开通」')
+                            ->default(true)
+                            ->inline(false),
+
+                        Forms\Components\Select::make('menu_template_id')
+                            ->label('菜单模版')
+                            ->options(fn () => MenuTemplate::query()
+                                ->orderBy('industry')
+                                ->orderBy('sort_order')
+                                ->get()
+                                ->mapWithKeys(fn ($t) => [
+                                    $t->id => $t->industry.' · '.$t->name.($t->is_active ? '（当前生效）' : ''),
+                                ])
+                            )
+                            ->placeholder('使用行业默认（当前生效模版）')
+                            ->searchable()
+                            ->nullable()
+                            ->helperText('留空则跟随行业默认菜单'),
                     ]),
 
                 Schemas\Components\Section::make('角色分配')
@@ -96,8 +118,7 @@ class UserResource extends Resource
                             ])
                             ->columns(2)
                             ->addActionLabel('+ 添加角色')
-                            ->defaultItems(fn (string $operation) => $operation === 'create' ? 1 : 0)
-                            ->minItems(1)
+                            ->defaultItems(0)
                             ->reorderable(false),
                     ]),
             ]);
@@ -121,6 +142,13 @@ class UserResource extends Resource
                     ->boolean()
                     ->alignCenter(),
 
+                Tables\Columns\IconColumn::make('ai_enabled')
+                    ->label('AI')
+                    ->boolean()
+                    ->alignCenter()
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+
                 Tables\Columns\TextColumn::make('storeRoles')
                     ->label('角色')
                     ->badge()
@@ -131,6 +159,13 @@ class UserResource extends Resource
                         'storeRoles.role',
                         fn ($q) => $q->where('name', 'like', "%{$search}%")
                     )),
+
+                Tables\Columns\TextColumn::make('menuTemplate.name')
+                    ->label('菜单')
+                    ->placeholder('默认')
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('注册时间')

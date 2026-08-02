@@ -21,7 +21,7 @@ class KnowledgeItemResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string|\UnitEnum|null $navigationGroup = '知识库';
+    protected static string|\UnitEnum|null $navigationGroup = '企业知识库(AI版)';
 
     protected static ?string $navigationLabel = '知识条目';
 

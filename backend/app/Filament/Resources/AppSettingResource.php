@@ -17,7 +17,9 @@ class AppSettingResource extends Resource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static string | \UnitEnum | null $navigationGroup = '系统';
+    protected static bool $shouldRegisterNavigation = false;
+
+    protected static string | \UnitEnum | null $navigationGroup = '前端系统';
 
     protected static ?string $navigationLabel = '应用设置';
 

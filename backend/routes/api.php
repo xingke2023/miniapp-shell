@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/app-config', [AppConfigController::class, 'index']);
 Route::get('/industries', [IndustryController::class, 'index']);
-Route::get('/quick-actions', [QuickActionController::class, 'index']);
 
 // SSO 单点登录（外部 Auth Center，桥接换本地 JWT）
 Route::post('/auth/sso/login', [SsoAuthController::class, 'login']);
@@ -28,6 +27,7 @@ Route::post('/auth/sso/refresh', [SsoAuthController::class, 'refresh']);
 Route::middleware('auth.hybrid')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::get('/quick-actions', [QuickActionController::class, 'index']);
 
     // AI 助手
     Route::post('/ai/message', [AiAssistantController::class, 'message']);

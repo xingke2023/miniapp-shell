@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AiMessage;
 use App\Models\AiSession;
+use App\Models\MenuTemplate;
 use App\Models\WeatherLog;
 use App\Services\AiService;
 use App\Services\KnowledgeService;
@@ -26,6 +27,10 @@ class AiAssistantController extends Controller
      */
     public function message(Request $request): JsonResponse
     {
+        if (! ($request->user()->ai_enabled ?? true)) {
+            return response()->json(['reply' => '此项功能尚未开通', 'intent' => 'other', 'operations' => []]);
+        }
+
         $request->validate([
             'text' => 'nullable|string|max:2000',
             'image_base64' => 'nullable|string',
@@ -50,7 +55,8 @@ class AiAssistantController extends Controller
             $this->knowledgeService->findRelevant($text)
         );
 
-        $parsed = $this->aiService->parseInventoryIntent($text, $imageBase64, $knowledgeContext);
+        $settingsOverride = $this->resolveTemplateSettings($request);
+        $parsed = $this->aiService->parseInventoryIntent($text, $imageBase64, $knowledgeContext, $settingsOverride);
 
         $processingMs = (int) ((microtime(true) - $startTime) * 1000);
 
@@ -97,6 +103,10 @@ class AiAssistantController extends Controller
      */
     public function voice(Request $request): JsonResponse
     {
+        if (! ($request->user()->ai_enabled ?? true)) {
+            return response()->json(['reply' => '此项功能尚未开通', 'intent' => 'other', 'operations' => []]);
+        }
+
         $request->validate([
             'audio' => 'required|file|mimes:mp3,wav,m4a,webm,ogg|max:25600',
             'session_id' => 'nullable|integer|exists:ai_sessions,id',
@@ -125,7 +135,8 @@ class AiAssistantController extends Controller
             $this->knowledgeService->findRelevant($transcribedText)
         );
 
-        $parsed = $this->aiService->parseInventoryIntent($transcribedText, null, $knowledgeContext);
+        $settingsOverride = $this->resolveTemplateSettings($request);
+        $parsed = $this->aiService->parseInventoryIntent($transcribedText, null, $knowledgeContext, $settingsOverride);
         $processingMs = (int) ((microtime(true) - $startTime) * 1000);
 
         AiMessage::create([
@@ -262,5 +273,18 @@ class AiAssistantController extends Controller
             'status' => 1,
             'started_at' => now(),
         ]);
+    }
+
+    /** 读取当前用户绑定模板的 settings，供 AI 覆盖全局配置。 */
+    private function resolveTemplateSettings(Request $request): array
+    {
+        $user = $request->user();
+        if (! $user?->menu_template_id) {
+            return [];
+        }
+
+        $tpl = MenuTemplate::find($user->menu_template_id);
+
+        return (array) ($tpl?->settings ?? []);
     }
 }

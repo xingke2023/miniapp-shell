@@ -7,6 +7,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -30,23 +31,38 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('AI助手后台管理')
+            ->brandName('企业AI落地作业系统')
             ->brandLogo(null)
             ->brandLogoHeight('2.5rem')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn (): HtmlString => new HtmlString('<style>.fi-logo { font-size: 2.2rem !important; font-weight: 300 !important; } .fi-sidebar-header .fi-logo { font-size: 1.5rem !important; } .fi-simple-header-heading { display: none !important; }</style>'),
+                fn (): HtmlString => new HtmlString('<style>.fi-sidebar-header .fi-logo, .fi-simple-header .fi-logo { font-size: 1.3rem !important; font-weight: 200 !important; letter-spacing: .03em !important; }</style>'),
             )
             ->colors([
                 'primary' => Color::Amber,
             ])
             ->navigationGroups([
+                NavigationGroup::make('前端系统'),
+                NavigationGroup::make('业务系统'),
+                NavigationGroup::make('企业知识库(AI版)'),
+                NavigationGroup::make('系统管理'),
                 NavigationGroup::make('供应商及商品'),
                 NavigationGroup::make('销售管理'),
                 NavigationGroup::make('财务收支'),
                 NavigationGroup::make('人才库'),
-                NavigationGroup::make('系统管理'),
+            ])
+            ->navigationItems([
+                NavigationItem::make('订单系统')
+                    ->group('业务系统')
+                    ->icon('heroicon-o-shopping-cart')
+                    ->url(fn () => \App\Filament\Pages\ComingSoon::getUrl())
+                    ->sort(1),
+                NavigationItem::make('CRM系统')
+                    ->group('业务系统')
+                    ->icon('heroicon-o-user-group')
+                    ->url(fn () => \App\Filament\Pages\ComingSoon::getUrl())
+                    ->sort(2),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

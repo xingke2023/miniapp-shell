@@ -19,7 +19,7 @@ class IndustryResource extends Resource
 
     protected static bool $shouldRegisterNavigation = false;
 
-    protected static string|\UnitEnum|null $navigationGroup = '系统';
+    protected static string|\UnitEnum|null $navigationGroup = '前端系统';
 
     protected static ?string $navigationLabel = '行业模版';
 

@@ -4,12 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MenuTemplateResource\Pages;
 use App\Filament\Resources\MenuTemplateResource\RelationManagers\QuickActionsRelationManager;
+use App\Models\AppSetting;
 use App\Models\Industry;
 use App\Models\MenuTemplate;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,15 +22,15 @@ class MenuTemplateResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
 
-    protected static string|\UnitEnum|null $navigationGroup = '系统';
+    protected static string|\UnitEnum|null $navigationGroup = '前端系统';
 
-    protected static ?string $navigationLabel = '菜单模版';
+    protected static ?string $navigationLabel = '小程序菜单模版';
 
-    protected static ?string $modelLabel = '菜单模版';
+    protected static ?string $modelLabel = '小程序菜单模版';
 
-    protected static ?string $pluralModelLabel = '菜单模版';
+    protected static ?string $pluralModelLabel = '小程序菜单模版';
 
     protected static ?int $navigationSort = 18;
 
@@ -42,7 +44,7 @@ class MenuTemplateResource extends Resource
                     ->options(fn () => Industry::query()->orderBy('sort_order')->pluck('name', 'slug'))
                     ->searchable()
                     ->required()
-                    ->helperText('该模版属于哪个行业；切换生效模版用列表里的「设为当前」'),
+                    ->helperText('该模版属于哪个行业；在列表页用「设为默认」指定全局默认模版'),
 
                 Forms\Components\TextInput::make('name')
                     ->label('模版名')
@@ -54,6 +56,39 @@ class MenuTemplateResource extends Resource
                     ->label('排序（小在前）')
                     ->numeric()
                     ->default(0),
+
+                Section::make('应用设置')
+                    ->description('覆盖全局默认值；留空则使用全局「应用设置」中的值')
+                    ->collapsible()
+                    ->collapsed()
+                    ->columnSpanFull()
+                    ->schema([
+                        Forms\Components\TextInput::make('settings.brand_name')
+                            ->label('品牌名称')
+                            ->placeholder(fn () => AppSetting::get('brand_name', '（全局默认）'))
+                            ->maxLength(100),
+
+                        Forms\Components\TextInput::make('settings.store_type')
+                            ->label('AI 门店类型描述')
+                            ->placeholder(fn () => AppSetting::get('store_type', '（全局默认）'))
+                            ->helperText('用于 AI 系统提示词，如"药品零售门店"、"服装零售门店"')
+                            ->maxLength(100),
+
+                        Forms\Components\TextInput::make('settings.miniprogram_title')
+                            ->label('小程序顶部标题')
+                            ->placeholder(fn () => AppSetting::get('miniprogram_title', '（全局默认）'))
+                            ->maxLength(50),
+
+                        Forms\Components\TextInput::make('settings.industry_page_title')
+                            ->label('行业选择页大标题')
+                            ->placeholder(fn () => AppSetting::get('industry_page_title', '（全局默认）'))
+                            ->maxLength(100),
+
+                        Forms\Components\TextInput::make('settings.industry_page_subtitle')
+                            ->label('行业选择页副标题')
+                            ->placeholder(fn () => AppSetting::get('industry_page_subtitle', '（全局默认）'))
+                            ->maxLength(100),
+                    ]),
             ]);
     }
 
@@ -64,8 +99,12 @@ class MenuTemplateResource extends Resource
                 Tables\Columns\TextColumn::make('industry')->label('行业')->badge()->searchable(),
                 Tables\Columns\TextColumn::make('name')->label('模版名')->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label('当前生效')
-                    ->boolean(),
+                    ->label('默认模板')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-star')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor('warning')
+                    ->falseColor('gray'),
                 Tables\Columns\TextColumn::make('quick_actions_count')
                     ->label('按钮数')
                     ->counts('quickActions'),
@@ -78,20 +117,18 @@ class MenuTemplateResource extends Resource
             ])
             ->actions([
                 Actions\Action::make('activate')
-                    ->label('设为当前')
-                    ->icon('heroicon-o-check-badge')
-                    ->color('success')
+                    ->label('设为默认')
+                    ->icon('heroicon-o-star')
+                    ->color('warning')
                     ->visible(fn (MenuTemplate $record) => ! $record->is_active)
                     ->requiresConfirmation()
-                    ->modalDescription('设为该行业当前生效的菜单，原生效模版将被取消。')
+                    ->modalHeading('设为默认模板')
+                    ->modalDescription('将此模板设为全局默认。未指定模板的用户都将使用此菜单。')
                     ->action(function (MenuTemplate $record): void {
-                        MenuTemplate::query()
-                            ->where('industry', $record->industry)
-                            ->whereKeyNot($record->getKey())
-                            ->update(['is_active' => false]);
+                        MenuTemplate::query()->update(['is_active' => false]);
                         $record->update(['is_active' => true]);
 
-                        Notification::make()->success()->title('已设为当前生效模版')->send();
+                        Notification::make()->success()->title('已设为默认模板')->send();
                     }),
 
                 Actions\Action::make('duplicate')
@@ -105,6 +142,13 @@ class MenuTemplateResource extends Resource
 
                         Notification::make()->success()->title('已复制模版')->send();
                     }),
+
+                Actions\Action::make('export')
+                    ->label('导出')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('gray')
+                    ->url(fn (MenuTemplate $record) => route('admin.menu-templates.export', $record))
+                    ->openUrlInNewTab(),
 
                 Actions\EditAction::make(),
                 Actions\DeleteAction::make(),
@@ -153,6 +197,7 @@ class MenuTemplateResource extends Resource
             'index' => Pages\ListMenuTemplates::route('/'),
             'create' => Pages\CreateMenuTemplate::route('/create'),
             'edit' => Pages\EditMenuTemplate::route('/{record}/edit'),
+            'buttons' => Pages\ManageMenuQuickActions::route('/{record}/buttons'),
         ];
     }
 }
